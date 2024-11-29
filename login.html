@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- LINK icon -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <!-- LINK font Muli -->
+    <link href="https://fonts.cdnfonts.com/css/muli" rel="stylesheet" />
+    <!-- LINK CSS -->
+    <link href="login.css" rel="stylesheet"/>
+    <!-- LINK JavaScript -->
+    <script type="text/JavaScript" src="app.js" defer></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <section>
+      <div class="properties">
+        <div class="form-box">
+          <form action="" class="sign-in">
+            <h2>Đăng nhập</h2>
+            <div class="input-box">
+              <ion-icon name="text-outline"></ion-icon>
+              <input type="text" required />
+              <label for="">Tên người dùng</label>
+            </div>
+            <div class="input-box">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <ion-icon name="eye-off-outline"></ion-icon>
+              <ion-icon name="eye-outline"></ion-icon>
+              <input type="password" class="pass" required />
+              <label for="">Mật khẩu</label>
+            </div>
+            <div class="forget">
+              <label for=""> <input type="checkbox" />Lưu đăng nhập </label>
+              <a href="#">Quên mật khẩu</a>
+            </div>
+            <button>Đăng nhập</button>
+            <!-- <div class="register">
+                <p>Không thể đăng nhập? <a href="#">Tạo tài khoản</a></p>
+              </div> -->
+          </form>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
