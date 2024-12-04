@@ -1,0 +1,18 @@
+@import '/static/settings.css';
+
+header {
+    display: flex;
+    justify-content: space-between;
+    grid-area: header;
+    position: sticky;
+    top: 0;
+
+    background: var(--accent-clr);
+    color: var(--base-clr);
+    padding: 1.3em;
+}
+
+.func-name {
+    font-size: 1.3em;
+    font-weight: 700;
+}

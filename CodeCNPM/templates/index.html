@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Xin chao</title>
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <h1>Xin chao {{ current_user.ten_tai_khoan }}</h1>
+    {% else %}
+    <h1>Cut</h1>
+   {% endif %}
+</body>
+</html>

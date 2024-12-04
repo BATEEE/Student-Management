@@ -15,37 +15,37 @@
     <!-- LINK font Muli -->
     <link href="https://fonts.cdnfonts.com/css/muli" rel="stylesheet" />
     <!-- LINK CSS -->
-    <link href="login.css" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet"/>
     <!-- LINK JavaScript -->
-    <script type="text/JavaScript" src="app.js" defer></script>
+    <script type="text/JavaScript" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
     <title>Document</title>
   </head>
   <body>
     <section>
       <div class="properties">
         <div class="form-box">
-          <form action="" class="sign-in">
+          <form method="post" action="/login" class="sign-in">
             <h2>Đăng nhập</h2>
             <div class="input-box">
               <ion-icon name="text-outline"></ion-icon>
-              <input type="text" required />
-              <label for="">Tên người dùng</label>
+              <input type="text" name="username" id="username" required />
+              <label for="username">Tên người dùng</label>
             </div>
             <div class="input-box">
               <ion-icon name="lock-closed-outline"></ion-icon>
               <ion-icon name="eye-off-outline"></ion-icon>
               <ion-icon name="eye-outline"></ion-icon>
-              <input type="password" class="pass" required />
-              <label for="">Mật khẩu</label>
+              <input type="password" class="pass" id="pwd" name="password" required />
+              <label for="pwd">Mật khẩu</label>
             </div>
             <div class="forget">
-              <label for=""> <input type="checkbox" />Lưu đăng nhập </label>
+              <label for="forget"> <input id="forget" type="checkbox" />Lưu đăng nhập </label>
               <a href="#">Quên mật khẩu</a>
             </div>
-            <button>Đăng nhập</button>
-            <!-- <div class="register">
-                <p>Không thể đăng nhập? <a href="#">Tạo tài khoản</a></p>
-              </div> -->
+            {% if not err_msg == "" %}
+            <div class="err_msg">{{ err_msg }}</div>
+            {% endif %}
+            <button type="submit">Đăng nhập</button>
           </form>
         </div>
       </div>

@@ -141,6 +141,20 @@ button {
   color: white;
 }
 
+@keyframe ErrorMessage {
+    0% {
+        display: block
+    }
+
+    100% {
+        display: none
+    }
+}
+
+button:checked .err_msg {
+    animation: ErrorMessage 3s
+}
+
 /* .register {
     font-size: 0.9em;
     color: white;
