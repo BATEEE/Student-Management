@@ -1,0 +1,49 @@
+{% extends 'layout/employee_config/base_ems.html' %}
+
+{% block content %}
+<div class="main-container">
+    <form method="post">
+        <div class="thems-text">1. Nhập thông tin cá nhân</div>
+        <div class="content-block flex">
+            <div class="content flex">
+                <label>Nhập ID học sinh:</label>
+                <input type="text" name="" placeholder=""/>
+            </div>
+            <div class="content flex">
+                <label>Nhập họ học sinh:</label>
+                <input type="text" name="" placeholder=""/>
+            </div>
+            <div class="content flex">
+                <label>Nhập tên học sinh:</label>
+                <input type="text" name="" placeholder=""/>
+            </div>
+        </div>
+
+        <div class="content-block flex">
+            <div class="content flex">
+                <label>Chọn ngày sinh:</label>
+                <input type="date" name="" placeholder=""/>
+            </div>
+            <div class="content flex">
+                <label for="sex">Chọn giới tính:</label>
+                <select id="sex">
+                    <option>Nam</option>
+                    <option>Nữ</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="thems-text">2. Nhập thông tin liên hệ</div>
+        <div class="content-block flex">
+            <div class="content flex">
+                <label>Nhập số điện thoại:</label>
+                <input type="tel" name="" placeholder=""/>
+            </div>
+            <div class="content flex">
+                <label>Nhập email:</label>
+                <input type="email" name="" placeholder=""/>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Quản lý học sinh</title>
+    <!-- LINK font Muli -->
+    <link href="https://fonts.cdnfonts.com/css/muli" rel="stylesheet"/>
+    <!-- LINK CSS -->
+    <link href="{{ url_for('static', filename='css/employees.css') }}" rel="stylesheet"/>
+    <!-- LINK JavaScript -->
+    <script type="text/JavaScript" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
+</head>
+<body>
+
+{% block sidebar %}
+{% include 'layout/employee_config/sidebar_ems.html' %}
+{% endblock %}
+
+<main>
+
+    {% block header %}
+    {% include 'layout/employee_config/header_ems.html' %}
+    {% endblock %}
+
+
+    {% block content required %}
+    {% endblock %}
+
+
+    {% block footer %}
+    {% include 'layout/employee_config/footer_ems.html' %}
+    {% endblock %}
+
+
+</main>
+</body>
+</html>
