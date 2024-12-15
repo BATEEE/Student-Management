@@ -44,3 +44,23 @@ document.addEventListener("DOMContentLoaded", function () {
       })
     })
 })
+
+
+//edit-student
+
+function toggleEditStudent() {
+        const inputFields = document.querySelectorAll(".editInput");
+        const selectFields = document.querySelectorAll(".editSelect");
+
+        inputFields.forEach(input => {
+            if (input.hasAttribute("readonly")) {
+                input.removeAttribute("readonly");
+            }
+        })
+
+        selectFields.forEach(select => {
+            if (select.hasAttribute("disabled")) {
+                select.removeAttribute("disabled");
+            }
+        })
+    }

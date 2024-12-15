@@ -2,48 +2,70 @@
 
 {% block content %}
 <div class="main-container">
-    <form method="post">
-        <div class="thems-text">1. Nhập thông tin cá nhân</div>
+    <form method="">
         <div class="content-block flex">
             <div class="content flex">
                 <label>Nhập ID học sinh:</label>
-                <input type="text" name="" placeholder=""/>
-            </div>
-            <div class="content flex">
-                <label>Nhập họ học sinh:</label>
-                <input type="text" name="" placeholder=""/>
-            </div>
-            <div class="content flex">
-                <label>Nhập tên học sinh:</label>
-                <input type="text" name="" placeholder=""/>
+                <input type="text" name="" placeholder="" required/>
             </div>
         </div>
 
-        <div class="content-block flex">
-            <div class="content flex">
-                <label>Chọn ngày sinh:</label>
-                <input type="date" name="" placeholder=""/>
-            </div>
-            <div class="content flex">
-                <label for="sex">Chọn giới tính:</label>
-                <select id="sex">
-                    <option>Nam</option>
-                    <option>Nữ</option>
-                </select>
-            </div>
-        </div>
+        <button type="submit">Tìm kiếm</button>
 
-        <div class="thems-text">2. Nhập thông tin liên hệ</div>
-        <div class="content-block flex">
-            <div class="content flex">
-                <label>Nhập số điện thoại:</label>
-                <input type="tel" name="" placeholder=""/>
+        {% if student %}
+        <div class="edit-student-container">
+            <input type="button" value="Chỉnh sửa" class="edit-student" onclick="toggleEditStudent()"/>
+
+            <div class="thems-text">1. Thông tin cá nhân</div>
+            <div class="content-block flex">
+                <div class="content flex">
+                    <label>ID học sinh:</label>
+                    <input class="editInput" type="text" name="" placeholder="" required readonly/>
+                </div>
+                <div class="content flex">
+                    <label>Họ học sinh:</label>
+                    <input class="editInput" type="text" name="" placeholder="" readonly/>
+                </div>
+                <div class="content flex">
+                    <label>Tên học sinh:</label>
+                    <input class="editInput" type="text" name="" placeholder="" required readonly/>
+                </div>
             </div>
-            <div class="content flex">
-                <label>Nhập email:</label>
-                <input type="email" name="" placeholder=""/>
+
+            <div class="content-block flex">
+                <div class="content flex">
+                    <label>Ngày sinh:</label>
+                    <input class="editInput" type="date" name="" placeholder="" required readonly/>
+                </div>
+                <div class="content flex">
+                    <label for="sex">Giới tính:</label>
+                    <select class="editSelect" id="sex" disabled>
+                        <option>Nam</option>
+                        <option>Nữ</option>
+                    </select>
+                </div>
             </div>
+
+            <div class="thems-text">2. Thông tin liên hệ</div>
+            <div class="content-block flex">
+                <div class="content flex">
+                    <label>Số điện thoại:</label>
+                    <input class="editInput" type="tel" name="" placeholder="" readonly/>
+                </div>
+                <div class="content flex">
+                    <label>Email:</label>
+                    <input class="editInput" type="email" name="" placeholder="" readonly/>
+                </div>
+            </div>
+
+            <button type="submit">Lưu</button>
+
         </div>
+        {% elif error_message %}
+        <div class="error-message">KHÔNG TÌM THẤY HỌC SINH!!!</div>
+        {% endif %}
+
+
     </form>
 </div>
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'layout/employee_config/base_ems.html' %}
+
+{% block content %}
+<div class="main-container">
+    <div class="content-block flex">
+        <div class="content flex">
+            <label>Nhập ID học sinh:</label>
+            <input type="text" name="" placeholder="" required/>
+        </div>
+    </div>
+
+    <button type="submit">Tìm kiếm</button>
+
+    <div class="search-table">
+        <div class="thems-text">THÔNG TIN HỌC SINH:</div>
+        <div class="info flex">
+            <img src="" alt="Avatar">
+            <div class="line"></div>
+            <div class="p-info">
+                <div class="p-content"><span>ID:</span></div>
+                <div class="p-content"><span>Tên:</span></div>
+                <div class="p-content"><span>Lớp:</span></div>
+                <div class="p-content"><span>Số điện thoại:</span></div>
+                <div class="p-content"><span>Email:</span></div>
+                <div class="p-content"><span>Giới tính:</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
