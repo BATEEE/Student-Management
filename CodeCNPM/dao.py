@@ -28,3 +28,7 @@ def find_student(id):
     a = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
     print(a)
     return a
+
+def remove_student(id):
+    student = a = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
+    db.session.remove(student)

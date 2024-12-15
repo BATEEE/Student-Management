@@ -1,8 +1,5 @@
-from Tools.scripts.make_ctype import method
-from cgitb import reset
-
 from flask import request, redirect, render_template
-from dao import add_subject, find_student
+from dao import add_subject, find_student, remove_student
 from init import app, login
 from admin import *
 import dao
@@ -73,7 +70,7 @@ def update_student():
         id = request.args.get('id')
         student = find_student(id)
     elif request.method.__eq__('POST'):
-        pass
+        remove_student(id)
     theme_name = "Cập nhật thông tin học sinh"
     return render_template("ems/update_student.html", theme_name=theme_name, student=student)
 
