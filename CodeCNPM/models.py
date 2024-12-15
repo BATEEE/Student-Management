@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Boolean, Date, Integer, DateTime, Foreign
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 from enum import Enum as EnumRole
+from flask import redirect
 import hashlib
 import datetime
 
@@ -90,7 +91,6 @@ class QuanTri(db.Model):
     # __mapper_args__ = {
     #     'polymorphic_identity': 'quan_tri',
     # }
-
 
 class NhanVien(db.Model):
     __tablename__ = 'nhan_vien'
