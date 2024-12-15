@@ -1,6 +1,7 @@
 from flask import request, redirect, render_template
 from dao import add_subject
 from init import app, login
+from admin import *
 import dao
 from flask_login import login_user, logout_user, current_user
 
@@ -39,8 +40,11 @@ def subject():
 
     return render_template("subject.html")
 
-# Nhân viên: Thêm học sinh
-@app.route("/qt", methods=['get', 'post'])
+@app.route('/nv')
+def employee():
+    return render_template('ems/employee.html')
+
+@app.route('/nv/add', methods=['get', 'post'])
 def add_student():
     if request.method.__eq__('POST'):
         id = request.form.get('id')
@@ -50,6 +54,18 @@ def add_student():
         sex = request.form.get('sex')
 
     return render_template("ems/add_student.html")
+
+@app.route('/nv/search')
+def search_student():
+    return render_template("ems/search_student.html")
+
+@app.route('/nv/update')
+def update_student():
+    return render_template("ems/update_student.html")
+
+@app.route("/qt")
+def admin():
+    return render_template("admin/index.html")
 
 @login.user_loader
 def load_user(user_id):

@@ -6,6 +6,8 @@
     <title>Quản lý học sinh</title>
     <!-- LINK font Muli -->
     <link href="https://fonts.cdnfonts.com/css/muli" rel="stylesheet"/>
+    <!-- LINK icon -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <!-- LINK CSS -->
     <link href="{{ url_for('static', filename='css/employees.css') }}" rel="stylesheet"/>
     <!-- LINK JavaScript -->
@@ -20,7 +22,7 @@
 <main>
 
     {% block header %}
-    {% include 'layout/employee_config/header_ems.html' %}
+    {% include 'layout/header.html' %}
     {% endblock %}
 
 
@@ -29,7 +31,7 @@
 
 
     {% block footer %}
-    {% include 'layout/employee_config/footer_ems.html' %}
+    {% include 'layout/footer.html' %}
     {% endblock %}
 
 
