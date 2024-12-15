@@ -1,4 +1,4 @@
-from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc
+from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc, HocSinh
 from init import db
 import hashlib
 import sys
@@ -23,3 +23,8 @@ def add_subject(id, ten_mon_hoc):
 
 def get_user_by_id(id):
     return TaiKhoan.query.get(id)
+
+def find_student(id):
+    a = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
+    print(a)
+    return a

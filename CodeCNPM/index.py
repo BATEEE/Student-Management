@@ -1,5 +1,8 @@
+from Tools.scripts.make_ctype import method
+from cgitb import reset
+
 from flask import request, redirect, render_template
-from dao import add_subject
+from dao import add_subject, find_student
 from init import app, login
 from admin import *
 import dao
@@ -46,6 +49,8 @@ def employee():
 
 @app.route('/nv/add', methods=['get', 'post'])
 def add_student():
+    theme_name = "Thêm học sinh"
+
     if request.method.__eq__('POST'):
         id = request.form.get('id')
         first_name = request.form.get('first_name')
@@ -53,15 +58,24 @@ def add_student():
         date = request.form.get('birthday')
         sex = request.form.get('sex')
 
-    return render_template("ems/add_student.html")
+    return render_template("ems/add_student.html", theme_name=theme_name)
 
 @app.route('/nv/search')
 def search_student():
-    return render_template("ems/search_student.html")
+    theme_name = "Tìm kiếm học sinh"
+    return render_template("ems/search_student.html", theme_name=theme_name)
 
-@app.route('/nv/update')
+@app.route('/nv/update', methods=['get', 'post'])
 def update_student():
-    return render_template("ems/update_student.html")
+    student = None
+
+    if request.method.__eq__('GET'):
+        id = request.args.get('id')
+        student = find_student(id)
+    elif request.method.__eq__('POST'):
+        pass
+    theme_name = "Cập nhật thông tin học sinh"
+    return render_template("ems/update_student.html", theme_name=theme_name, student=student)
 
 @app.route("/qt")
 def admin():
