@@ -1,6 +1,7 @@
 from flask import request, redirect, render_template
 from dao import add_subject
 from init import app, login
+from admin import *
 import dao
 from flask_login import login_user, logout_user, current_user
 

@@ -128,6 +128,9 @@ class MonHoc(db.Model):
     hoc_sinh_hoc_mon = relationship('HocSinhHocMon', lazy=True)
     giao_vien_day_mon = relationship('GiaoVienDayMon', lazy=True)
 
+    def __str__(self):
+        return self.ten_mon_hoc
+
 
 class ThongTinNamHoc(db.Model):
     id = Column(String(10), primary_key=True)
@@ -186,5 +189,7 @@ if __name__ == '__main__':
                             ngay_tao="2004-2-12", email="thangancut@gmail.com", user_role=UserRole.QT)
         quantri = QuanTri(id='QT02', ho="Trần Tuấn", ten='Thắng', gioi_tinh=0, dia_chi="189/34/28A Bach Dang Phuong 3 Go Vap",
                           email="thangdaubuoi@gmail.com", ngay_sinh="2004-3-20", so_dien_thoai="01242542", tai_khoan_id=taikhoan.id)
-        db.session.add_all([taikhoan, quantri])
+        mon_hoc = MonHoc(id=1, ten_mon_hoc="Lập trình Python")
+        #db.session.add_all([taikhoan, quantri])
+        #db.session.add(mon_hoc)
         db.session.commit()
