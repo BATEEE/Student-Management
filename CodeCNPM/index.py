@@ -39,6 +39,7 @@ def subject():
 
     return render_template("subject.html")
 
+# Nhân viên: Thêm học sinh
 @app.route("/qt", methods=['get', 'post'])
 def add_student():
     if request.method.__eq__('POST'):
