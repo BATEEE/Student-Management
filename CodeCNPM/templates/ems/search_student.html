@@ -10,12 +10,13 @@
         <button type="submit">Tìm kiếm</button>
     </form>
 
+    {% if student: %}
     <div class="search-table">
         <div class="thems-text">THÔNG TIN HỌC SINH:</div>
         <div class="info flex">
             <img src="" alt="Avatar">
             <div class="line"></div>
-            {% if student: %}
+
             <div class="p-info">
                 <div class="p-content"><span>ID:</span> {{student.id}}</div>
                 <div class="p-content"><span>Tên:</span> {{student.ho + " " + student.ten}}</div>
@@ -25,10 +26,11 @@
                 <div class="p-content"><span>Email:</span> {{student.email}}</div>
                 <div class="p-content"><span>Giới tính:</span> {{"Nữ" if student.gioi_tinh else "Nam"}}</div>
             </div>
-<!--            {% else: %}-->
-<!--                <div>Không có học sinh mang id: {{student.id}}</div>-->
-            {% endif %}
+
         </div>
     </div>
+    {% else %}
+    <div class="error-message">KHÔNG TÌM THẤY HỌC SINH!!!</div>
+    {% endif %}
 </div>
 {% endblock %}

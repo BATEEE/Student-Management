@@ -36,7 +36,7 @@
         <div class="content-block flex">
             <div class="content flex">
                 <label>Nhập địa chỉ:</label>
-                <input type="text" name="address" value="{{student.dia_chi}}" placeholder="" required readonly/>
+                <input class="editInput" type="text" name="address" value="{{student.dia_chi}}" placeholder="" required readonly/>
             </div>
         </div>
 
@@ -48,13 +48,8 @@
             <div class="content flex">
                 <label for="sex">Giới tính:</label>
                 <select class="editSelect" id="sex" name="sex" disabled>
-                    {% if student.sex == 0%}
-                    <option name="nam" selected value="0">Nam</option>
-                    <option name="nu" value="1">Nữ</option>
-                    {% elif student.sex == 1 %}
-                    <option name="nam" value="0">Nam</option>
-                    <option name="nu" selected value="1">Nữ</option>
-                    {% endif %}
+                    <option value="0" name="nam" {% if student.gioi_tinh == 0 %}selected{% endif %}>Nam</option>
+                    <option value="1" name="nu"  {% if student.gioi_tinh == 1 %}selected{% endif %}>Nữ</option>
                 </select>
             </div>
         </div>
@@ -67,7 +62,7 @@
             </div>
             <div class="content flex">
                 <label>Email:</label>
-                <input class="editInpxut" type="email" name="email" value="{{student.email}}" placeholder="" readonly/>
+                <input class="editInput" type="email" name="email" value="{{student.email}}" placeholder="" readonly/>
             </div>
         </div>
 

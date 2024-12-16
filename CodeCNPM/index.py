@@ -104,4 +104,4 @@ def load_user(user_id):
     
 
 if __name__ == '__main__':
-    app.run(debug=True, host="26.7.192.47", port=2004)
+    app.run(debug=True)
