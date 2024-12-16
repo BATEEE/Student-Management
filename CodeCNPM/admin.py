@@ -27,7 +27,17 @@ class MonHocModelView(ModelView):
 
 #Quản lí user
 class AuthenticatedView(ModelView):
-
+    column_list = ('ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role')
+    column_searchable_list = ['ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
+    column_filters = ['ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
+    can_view_details = True
+    column_labels = {
+        'ten_tai_khoan': 'Tên tài khoản',
+        'mat_khau': 'Mật khẩu',
+        'ngay_tao': 'Ngày tạo',
+        'email': 'Email',
+        'user_role': 'Loại người dùng'
+    }
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role.__eq__(UserRole.QT)
 
