@@ -2,10 +2,12 @@
 
 {% block content %}
 <div class="main-container">
-    <form method="get" action="/nv/search" class="content-block flex">
-        <div class="content flex">
-            <label>Nhập ID học sinh:</label>
-            <input type="text" name="id" placeholder="" required/>
+    <form method="get" action="/nv/search">
+        <div class="content-block flex">
+            <div class="content flex">
+                <label>Nhập ID học sinh:</label>
+                <input type="text" name="id" placeholder="" required/>
+            </div>
         </div>
         <button type="submit">Tìm kiếm</button>
     </form>
@@ -30,7 +32,7 @@
         </div>
     </div>
     {% else %}
-    <div class="error-message">KHÔNG TÌM THẤY HỌC SINH!!!</div>
+    <div class="error-message"></div>
     {% endif %}
 </div>
 {% endblock %}

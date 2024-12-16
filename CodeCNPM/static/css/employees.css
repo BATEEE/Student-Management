@@ -31,6 +31,7 @@ main {
 
 .content-block {
     flex-wrap: wrap;
+    align-items: flex-start;
     margin: 1.7rem;
     gap: 1rem;
 }

@@ -14,3 +14,10 @@ header {
     font-size: 1.3em;
     font-weight: 700;
 }
+
+.exit {
+    text-decoration-line: underline;
+    color: red;
+    padding-left: 3px;
+    cursor: pointer;
+}
