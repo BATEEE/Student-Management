@@ -123,7 +123,7 @@ class LoaiDiem(db.Model):
 
 
 class MonHoc(db.Model):
-    id = Column(String(10), primary_key=True)
+    id = Column(String(10), primary_key=True,nullable=False)
     ten_mon_hoc = Column(String(50), nullable=False)
     hoc_sinh_hoc_mon = relationship('HocSinhHocMon', lazy=True)
     giao_vien_day_mon = relationship('GiaoVienDayMon', lazy=True)
@@ -184,17 +184,18 @@ class GiaoVienDayMon(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
-        # taikhoan = TaiKhoan(id='TK02',ten_tai_khoan="Trần Tuấn Thắng", tai_khoan="admin1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
-        #                     ngay_tao="2004-2-12", email="thangancut@gmail.com", user_role=UserRole.QT)
-        taikhoan = TaiKhoan(id='TK03',ten_tai_khoan="Nguyễn Hoàng Phúc", tai_khoan="nhanvien1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
-                             ngay_tao="2004-12-15", email="phuc@gmail.com", user_role=UserRole.NV)
+        # db.create_all()
+         taikhoan = TaiKhoan(id='TK02',ten_tai_khoan="Trần Tuấn Thắng", tai_khoan="admin1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
+                            ngay_tao="2004-2-12", email="thangancut@gmail.com", user_role=UserRole.QT)
+        # taikhoan = TaiKhoan(id='TK03',ten_tai_khoan="Nguyễn Hoàng Phúc", tai_khoan="nhanvien1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
+        #                      ngay_tao="2004-12-15", email="phuc@gmail.com", user_role=UserRole.NV)
         # quantri = QuanTri(id='QT02', ho="Trần Tuấn", ten='Thắng', gioi_tinh=0, dia_chi="189/34/28A Bach Dang Phuong 3 Go Vap",
         #                   email="thangdaubuoi@gmail.com", ngay_sinh="2004-3-20", so_dien_thoai="01242542", tai_khoan_id=taikhoan.id)
         # mon_hoc = MonHoc(id=1, ten_mon_hoc="Lập trình Python")
         #db.session.add_all([taikhoan, quantri])
         #db.session.add(mon_hoc)
-        nv = NhanVien(id='NV01', ho='Nguyễn Hoàng', ten='Phúc', gioi_tinh=0, dia_chi='189/34/28A Bach Dang Phuong 3 Go Vap',
-                      email="phuc@gmail.com", ngay_sinh="2004-12-31", so_dien_thoai="01242542", tai_khoan_id=taikhoan.id)
-        db.session.add_all([taikhoan, nv])
-        db.session.commit()
+        # nv = NhanVien(id='NV01', ho='Nguyễn Hoàng', ten='Phúc', gioi_tinh=0, dia_chi='189/34/28A Bach Dang Phuong 3 Go Vap',
+        #               email="phuc@gmail.com", ngay_sinh="2004-12-31", so_dien_thoai="01242542", tai_khoan_id=taikhoan.id)
+        # db.session.add_all([taikhoan, nv])
+         db.session.add(taikhoan)
+         db.session.commit()

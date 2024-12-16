@@ -1,7 +1,6 @@
 from flask import request, redirect, render_template
 import dao
 from init import app, login
-from admin import *
 from flask_login import login_user, logout_user, current_user
 from models import HocSinh
 
@@ -104,4 +103,7 @@ def load_user(user_id):
     
 
 if __name__ == '__main__':
-    app.run(debug=True, host="26.7.192.47", port=2004)
+    with app.app_context():
+        from admin import admin
+        app.run(debug=True)
+
