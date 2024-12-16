@@ -34,7 +34,6 @@ def get_user_by_id(id):
 
 def find_student(id):
     a = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
-    print(a)
     return a
 
 def find_student_class(id):
