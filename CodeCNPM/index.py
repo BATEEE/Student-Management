@@ -1,4 +1,5 @@
-from flask import request, redirect, render_template
+from flask import request, redirect, render_template, session, abort
+from functools import wraps
 import dao
 from init import app, login
 from admin import *
@@ -13,6 +14,16 @@ def index():
     else:
         return render_template("index.html")
 
+def role_required(allowed_roles):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if 'role' not in session or session['role'] not in allowed_roles:
+                abort(403)  # Trả về lỗi 403 Forbidden
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
 @app.route("/login", methods=['get', 'post'])
 def login_user_process():
     err_msg = ""
@@ -24,6 +35,9 @@ def login_user_process():
         if user:
             login_user(user)
             direct = str(user.user_role).split('.')[1].lower()
+            session['role'] = direct
+            if direct.__eq__('qt'):
+                direct = 'admin'
             return redirect('/' + direct)
         else:
             err_msg = "Tài khoản hoặc mật khẩu của bạn không chính xác"
@@ -41,10 +55,12 @@ def subject():
     return render_template("subject.html")
 
 @app.route('/nv')
+@role_required(['nv'])
 def employee():
     return render_template('ems/employee.html')
 
 @app.route('/nv/add', methods=['get', 'post'])
+@role_required(['nv'])
 def add_student_process():
     theme_name = "Thêm học sinh"
     count = str(HocSinh.query.count() + 1)
@@ -65,6 +81,7 @@ def add_student_process():
                            count=count, len_of_count=len(count))
 
 @app.route('/nv/search')
+@role_required(['nv'])
 def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
@@ -75,6 +92,7 @@ def search_student():
     return render_template("ems/search_student.html", theme_name=theme_name, student=student, student_class=student_class)
 
 @app.route('/nv/update', methods=['get', 'post'])
+@role_required(['nv'])
 def update_student():
     student = None
     id = request.args.get('id')
@@ -94,14 +112,10 @@ def update_student():
     theme_name = "Cập nhật thông tin học sinh"
     return render_template("ems/update_student.html", theme_name=theme_name, student=student)
 
-@app.route("/qt")
-def admin():
-    return render_template("admin/index.html")
-
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
     
 
 if __name__ == '__main__':
-    app.run(debug=True, host="26.7.192.47", port=2004)
+    app.run(debug=True)

@@ -48,10 +48,10 @@
             <div class="content flex">
                 <label for="sex">Giới tính:</label>
                 <select class="editSelect" id="sex" name="sex" disabled>
-                    {% if student.sex == 0%}
+                    {% if student.gioi_tinh == 0%}
                     <option name="nam" selected value="0">Nam</option>
                     <option name="nu" value="1">Nữ</option>
-                    {% elif student.sex == 1 %}
+                    {% elif student.gioi_tinh == 1 %}
                     <option name="nam" value="0">Nam</option>
                     <option name="nu" selected value="1">Nữ</option>
                     {% endif %}
