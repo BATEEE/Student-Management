@@ -37,8 +37,7 @@ def get_user_by_id(id):
     return TaiKhoan.query.get(id)
 
 def find_student(id):
-    a = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
-    print(a)
+    a = HocSinhThuocLop.query.filter(HocSinhThuocLop.hoc_sinh_id.__eq__(id)).first()
     return a
 
 def find_student_class(id):

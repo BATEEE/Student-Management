@@ -30,9 +30,9 @@ class TaiKhoan(db.Model, UserMixin):
     #     'polymorphic_on': Id,
     #     'with_polymorphic': "*"
     # }
-    giao_vien = relationship('GiaoVien', lazy=True)
-    nhan_vien = relationship('NhanVien', lazy=True)
-    quan_tri = relationship('QuanTri', lazy=True)
+    giao_vien = relationship('GiaoVien', backref="tai_khoan", lazy=True)
+    nhan_vien = relationship('NhanVien', backref="tai_khoan", lazy=True)
+    quan_tri = relationship('QuanTri', backref="tai_khoan", lazy=True)
 
 
 class HocSinh(db.Model):
@@ -44,8 +44,8 @@ class HocSinh(db.Model):
     email = Column(String(45))
     ngay_sinh = Column(Date)
     so_dien_thoai = Column(String(10))
-    hoc_sinh_hoc_mon = relationship('HocSinhHocMon', lazy=True)
-    hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', lazy=True)
+    hoc_sinh_hoc_mon = relationship('HocSinhHocMon', backref="hoc_sinh", lazy=True)
+    hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', backref="hoc_sinh", lazy=True)
 
 class GiaoVien(db.Model):
     __tablename__ = 'giao_vien'
@@ -57,7 +57,7 @@ class GiaoVien(db.Model):
     email = Column(String(45))
     ngay_sinh = Column(Date)
     so_dien_thoai = Column(String(10))
-    day = relationship('Day', lazy=True)
+    day = relationship('Day', backref="giao_vien", lazy=True)
     tai_khoan_id = Column(String(10), ForeignKey('tai_khoan.id'), unique=True)
 
     # def __init__(self, id, ho, ten, gioi_tinh, dia_chi, email, ngay_sinh, so_dien_thoai):
@@ -112,8 +112,8 @@ class NhanVien(db.Model):
 class Lop(db.Model):
     id = Column(String(10), primary_key=True)
     ten_lop = Column(String(50), nullable=False)
-    day = relationship('Day', lazy=True)
-    hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', lazy=True)
+    day = relationship('Day', backref="lop", lazy=True)
+    hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', backref="lop", lazy=True)
 
 
 class LoaiDiem(db.Model):
@@ -125,8 +125,8 @@ class LoaiDiem(db.Model):
 class MonHoc(db.Model):
     id = Column(String(10), primary_key=True,nullable=False)
     ten_mon_hoc = Column(String(50), nullable=False)
-    hoc_sinh_hoc_mon = relationship('HocSinhHocMon', lazy=True)
-    giao_vien_day_mon = relationship('GiaoVienDayMon', lazy=True)
+    hoc_sinh_hoc_mon = relationship('HocSinhHocMon', backref="mon_hoc", lazy=True)
+    giao_vien_day_mon = relationship('GiaoVienDayMon', backref="mon_hoc", lazy=True)
 
     def __str__(self):
         return self.ten_mon_hoc
@@ -137,14 +137,14 @@ class ThongTinNamHoc(db.Model):
     nam_hoc = Column(String(20), nullable=False)
     hoc_ki = Column(Integer, nullable=False)
     day = relationship('Day', lazy=True)
-    hoc_sinh_hoc_mon = relationship('HocSinhHocMon', lazy=True)
-    hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', lazy=True)
+    hoc_sinh_hoc_mon = relationship('HocSinhHocMon', backref="thong_tin_nam_hoc", lazy=True)
+    hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', backref="thong_tin_nam_hoc", lazy=True)
 
 
 class PhongHoc(db.Model):
     id = Column(String(10), primary_key=True)
     ten_phong = Column(String(45), nullable=False)
-    phong = relationship('Day', lazy=True)
+    phong = relationship('Day', backref="phong_hoc", lazy=True)
 
 
 class Day(db.Model):
@@ -166,7 +166,7 @@ class HocSinhHocMon(db.Model):
     mon_hoc_id = Column(String(10), ForeignKey('mon_hoc.id'), nullable=False)
     hoc_sinh_id = Column(String(10), ForeignKey('hoc_sinh.id'), nullable=False)
     thong_tin_nam_hoc_id = Column(String(10), ForeignKey('thong_tin_nam_hoc.id'), nullable=False)
-    diem = relationship('Diem', lazy=True)
+    diem = relationship('Diem', backref="hoc_sinh_hoc_mon", lazy=True)
 
 
 class HocSinhThuocLop(db.Model):
