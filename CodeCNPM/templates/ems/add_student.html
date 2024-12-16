@@ -2,12 +2,12 @@
 
 {% block content %}
 <div class="main-container">
-    <form action="qt" method="post">
+    <form action="/nv/add" method="post">
         <div class="thems-text">1. Nhập thông tin cá nhân</div>
         <div class="content-block flex">
             <div class="content flex">
                 <label>Nhập ID học sinh:</label>
-                <input type="text" name="id" placeholder="" required/>
+                <input type="text" name="id" placeholder="" disabled value="{{'HS' + '0' * (4 - len_of_count) + count}}"/>
             </div>
             <div class="content flex">
                 <label>Nhập họ học sinh:</label>

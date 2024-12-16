@@ -1,9 +1,9 @@
 from flask import request, redirect, render_template
-from dao import add_subject, find_student, remove_student
+import dao
 from init import app, login
 from admin import *
-import dao
 from flask_login import login_user, logout_user, current_user
+from models import HocSinh
 
 
 @app.route("/")
@@ -36,7 +36,7 @@ def subject():
         id = request.form.get('mon_hoc_id')
         ten_mon_hoc = request.form.get('ten_mon_hoc')
 
-        add_subject(id, ten_mon_hoc)
+        dao.add_subject(id, ten_mon_hoc)
 
     return render_template("subject.html")
 
@@ -45,32 +45,52 @@ def employee():
     return render_template('ems/employee.html')
 
 @app.route('/nv/add', methods=['get', 'post'])
-def add_student():
+def add_student_process():
     theme_name = "Thêm học sinh"
-
+    count = str(HocSinh.query.count() + 1)
+    student_id = None
     if request.method.__eq__('POST'):
-        id = request.form.get('id')
+        student_id = 'HS' + '0' * (4 - len(count)) + count
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
         date = request.form.get('birthday')
         sex = request.form.get('sex')
+        address = request.form.get('address')
+        contact = request.form.get('contact')
+        email = request.form.get('email')
 
-    return render_template("ems/add_student.html", theme_name=theme_name)
+        dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email, ngay_sinh=date, so_dien_thoai=contact)
+
+    return render_template("ems/add_student.html", theme_name=theme_name,
+                           count=count, len_of_count=len(count))
 
 @app.route('/nv/search')
 def search_student():
     theme_name = "Tìm kiếm học sinh"
-    return render_template("ems/search_student.html", theme_name=theme_name)
+    id = request.args.get('id')
+    student = dao.find_student(id)
+    student_class = None
+    if student:
+        student_class = dao.find_student_class(id)
+    return render_template("ems/search_student.html", theme_name=theme_name, student=student, student_class=student_class)
 
 @app.route('/nv/update', methods=['get', 'post'])
 def update_student():
     student = None
+    id = request.args.get('id')
 
     if request.method.__eq__('GET'):
-        id = request.args.get('id')
-        student = find_student(id)
+        student = dao.find_student(id)
     elif request.method.__eq__('POST'):
-        remove_student(id)
+        ho = request.form.get('first_name')
+        ten = request.form.get('last_name')
+        gioi_tinh = request.form.get('sex')
+        dia_chi = request.form.get('address')
+        email = request.form.get('email')
+        ngay_sinh = request.form.get('date')
+        so_dien_thoai = request.form.get('contact')
+        dao.update_studentinfo(id=id, ho=ho, ten=ten, gioi_tinh=int(gioi_tinh), dia_chi=dia_chi, email=email, ngay_sinh=ngay_sinh, so_dien_thoai=so_dien_thoai)
+
     theme_name = "Cập nhật thông tin học sinh"
     return render_template("ems/update_student.html", theme_name=theme_name, student=student)
 
@@ -84,4 +104,4 @@ def load_user(user_id):
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="26.7.192.47", port=2004)

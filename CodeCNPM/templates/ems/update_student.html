@@ -21,7 +21,7 @@
         <div class="content-block flex">
             <div class="content flex">
                 <label>ID học sinh:</label>
-                <input class="editInput" type="text" name="id" value="{{student.id}}" placeholder="" required readonly/>
+                <input class="editInput" type="text" name="" value="{{student.id}}" placeholder="" required readonly/>
             </div>
             <div class="content flex">
                 <label>Họ học sinh:</label>
@@ -49,11 +49,11 @@
                 <label for="sex">Giới tính:</label>
                 <select class="editSelect" id="sex" name="sex" disabled>
                     {% if student.sex == 0%}
-                    <option selected>Nam</option>
-                    <option>Nữ</option>
+                    <option name="nam" selected value="0">Nam</option>
+                    <option name="nu" value="1">Nữ</option>
                     {% else %}
-                    <option>Nam</option>
-                    <option selected>Nữ</option>
+                    <option name="nam" value="0">Nam</option>
+                    <option name="nu" selected value="1">Nữ</option>
                     {% endif %}
                 </select>
             </div>
