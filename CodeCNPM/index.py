@@ -2,7 +2,7 @@ from flask import request, redirect, render_template, session, abort
 from functools import wraps
 import dao
 from init import app, login
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required
 from models import HocSinh
 
 
@@ -85,12 +85,7 @@ def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
     student = dao.find_student(id)
-    student_class = None
-    if student:
-        student_class = dao.find_student_class(id)
-    else:
-        error_message = "KHÔNG TÌM THẤY HỌC SINH!!!"
-    return render_template("ems/search_student.html", theme_name=theme_name, student=student, student_class=student_class)
+    return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 @app.route('/nv/update', methods=['get', 'post'])
 @role_required(['nv'])
@@ -116,7 +111,12 @@ def update_student():
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
-    
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/login')
 
 if __name__ == '__main__':
     with app.app_context():
