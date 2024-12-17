@@ -62,9 +62,9 @@ def employee():
 @role_required(['nv'])
 def add_student_process():
     theme_name = "Thêm học sinh"
-    count = str(HocSinh.query.count() + 1)
     student_id = None
     if request.method.__eq__('POST'):
+        count = str(HocSinh.query.count() + 1)
         student_id = 'HS' + '0' * (4 - len(count)) + count
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
@@ -76,6 +76,7 @@ def add_student_process():
 
         dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email, ngay_sinh=date, so_dien_thoai=contact)
 
+    count = str(HocSinh.query.count() + 1)
     return render_template("ems/add_student.html", theme_name=theme_name,
                            count=count, len_of_count=len(count))
 
@@ -84,7 +85,7 @@ def add_student_process():
 def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
-    student = dao.find_student(id)
+    student = dao.find_student_class(id)
     return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 @app.route('/nv/update', methods=['get', 'post'])

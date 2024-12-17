@@ -113,6 +113,7 @@ class NhanVien(db.Model):
 class Lop(db.Model):
     id = Column(String(10), primary_key=True)
     ten_lop = Column(String(50), nullable=False)
+    khoi_lop = Column(Integer, nullable=False)
     day = relationship('Day', backref="lop", lazy=True)
     hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', backref="lop", lazy=True)
 
@@ -158,8 +159,8 @@ class Day(db.Model):
 
 class Diem(db.Model):
     id = Column(String(10), primary_key=True)
-    ten_diem = Column(Double, nullable=False)
-    load_diem_id = Column(String(10), ForeignKey('loai_diem.id'), nullable=False)
+    so_diem = Column(Double, nullable=False)
+    loai_diem_id = Column(String(10), ForeignKey('loai_diem.id'), nullable=False)
     hoc_sinh_hoc_mon_id = Column(String(10), ForeignKey('hoc_sinh_hoc_mon.id'), nullable=False)
 
 class HocSinhHocMon(db.Model):
