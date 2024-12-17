@@ -116,6 +116,7 @@ def update_student():
 
 @app.route('/nv/make_profile')
 @role_required(['nv'])
+@login_required
 def make_profile_student():
     theme_name = "Tạo hồ sơ học sinh"
     count = str(HocSinh.query.count() + 1)
@@ -135,19 +136,31 @@ def make_profile_student():
     return render_template("ems/make_profile_student.html", theme_name=theme_name,
                            count=count, len_of_count=len(count))
 
-@app.route('/nv/create_class')
+@app.route('/nv/create_class', methods=['get', 'post'])
 @role_required(['nv'])
+@login_required
 def create_class():
     theme_name = "Lập danh sách lớp"
-    return render_template('ems/create_class.html', theme_name=theme_name)
+    list_class = dao.get_all_class()
+    selected_id = 3
+    list_student = None
+    number_of_class = 0
+    if request.method.__eq__('GET'):
+        class_id = request.args.get('class_id')
+        number_of_class = request.args.get('number_of_class')
+        list_student = dao.create_class(class_id=class_id, number_of_class=number_of_class)
+        print(list_student)
+        selected_id = class_id
+    return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=selected_id, list_student=list_student
+                           , number_of_class=number_of_class)
 
 
 @app.route('/nv/adjust_class')
 @role_required(['nv'])
+@login_required
 def adjust_class():
     theme_name = "Điều chỉnh danh sách lớp"
     return render_template('ems/adjust_class.html', theme_name=theme_name)
-
 
 @login.user_loader
 def load_user(user_id):
@@ -163,4 +176,4 @@ def log_out():
 if __name__ == '__main__':
     with app.app_context():
         from admin import admin
-        app.run(debug=True)
+        app.run(debug=True, port=2004)

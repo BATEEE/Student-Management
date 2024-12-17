@@ -1,11 +1,10 @@
 from fileinput import hook_compressed
 
 from flask_sqlalchemy import SQLAlchemy
-
 from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc, HocSinh, HocSinhThuocLop, Lop, LoaiDiem, Diem, \
     HocSinhHocMon, ThongTinNamHoc
 from init import db
-from sqlalchemy import func
+from sqlalchemy import func, asc
 from datetime import datetime
 import hashlib
 
@@ -44,10 +43,27 @@ def find_student(id):
     student = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
     return student
 
+# Lay danh sach lop hoc
+def get_all_class():
+    return Lop.query.all()
+
+# Them hoc sinh vao lop
+def add_student_into_class(student_id, class_id):
+    hoc_sinh_thuoc_lop
+
+# Tao danh sach lop
+def create_class(number_of_class, class_id):
+    student_of_class = HocSinhThuocLop.query.all() # Lấy danh sách học sinh đã có lớp
+    new_students = [x.hoc_sinh_id for x in student_of_class] # Lọc học sinh đã có lớp và học sinh chưa có
+
+    # random từ danh sách học sinh bỏ đi danh sách học sinh của new student vì chỉ cần lấy danh sách học sinh chưa có lớp
+    random_student = (HocSinh.query.filter(HocSinh.id.notin_(new_students)).order_by(func.random()).limit(number_of_class).all())
+    return random_student
+
+
 # sửa thông tin học sinh
 def update_studentinfo(id, ho, ten, gioi_tinh, dia_chi, email, ngay_sinh, so_dien_thoai):
     student = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
-    print(student)
     if student:
         student.ho = ho
         student.ten = ten
