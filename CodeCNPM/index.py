@@ -113,6 +113,42 @@ def update_student():
     theme_name = "Cập nhật thông tin học sinh"
     return render_template("ems/update_student.html", theme_name=theme_name, student=student)
 
+
+@app.route('/nv/make_profile')
+@role_required(['nv'])
+def make_profile_student():
+    theme_name = "Tạo hồ sơ học sinh"
+    count = str(HocSinh.query.count() + 1)
+    student_id = None
+    if request.method.__eq__('POST'):
+        student_id = 'HS' + '0' * (4 - len(count)) + count
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        date = request.form.get('birthday')
+        sex = request.form.get('sex')
+        address = request.form.get('address')
+        contact = request.form.get('contact')
+        email = request.form.get('email')
+
+        dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email, ngay_sinh=date, so_dien_thoai=contact)
+
+    return render_template("ems/make_profile_student.html", theme_name=theme_name,
+                           count=count, len_of_count=len(count))
+
+@app.route('/nv/create_class')
+@role_required(['nv'])
+def create_class():
+    theme_name = "Lập danh sách lớp"
+    return render_template('ems/create_class.html', theme_name=theme_name)
+
+
+@app.route('/nv/adjust_class')
+@role_required(['nv'])
+def adjust_class():
+    theme_name = "Điều chỉnh danh sách lớp"
+    return render_template('ems/adjust_class.html', theme_name=theme_name)
+
+
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
