@@ -20,13 +20,13 @@
             <div class="line"></div>
 
             <div class="p-info">
-                <div class="p-content"><span>ID:</span> {{student.id}}</div>
-                <div class="p-content"><span>Tên:</span> {{student.ho + " " + student.ten}}</div>
-                <div class="p-content"><span>Lớp:</span> {{student_class.ten_lop}}</div>
-                <div class="p-content"><span>Số điện thoại:</span> {{student.so_dien_thoai}}</div>
-                <div class="p-content"><span>Địa chỉ:</span> {{student.dia_chi}}</div>
-                <div class="p-content"><span>Email:</span> {{student.email}}</div>
-                <div class="p-content"><span>Giới tính:</span> {{"Nữ" if student.gioi_tinh else "Nam"}}</div>
+                <div class="p-content"><span>ID:</span> {{student.hoc_sinh.id}}</div>
+                <div class="p-content"><span>Tên:</span> {{student.hoc_sinh.ho + " " + student.hoc_sinh.ten}}</div>
+                <div class="p-content"><span>Lớp:</span> {{student.lop.ten_lop}}</div>
+                <div class="p-content"><span>Số điện thoại:</span> {{student.hoc_sinh.so_dien_thoai}}</div>
+                <div class="p-content"><span>Địa chỉ:</span> {{student.hoc_sinh.dia_chi}}</div>
+                <div class="p-content"><span>Email:</span> {{student.hoc_sinh.email}}</div>
+                <div class="p-content"><span>Giới tính:</span> {{"Nữ" if student.hoc_sinh.gioi_tinh else "Nam"}}</div>
             </div>
 
         </div>

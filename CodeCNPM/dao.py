@@ -36,18 +36,18 @@ def add_student(id, ho, ten, gioi_tinh, dia_chi, email, ngay_sinh, so_dien_thoai
 def get_user_by_id(id):
     return TaiKhoan.query.get(id)
 
-def find_student(id):
-    a = HocSinhThuocLop.query.filter(HocSinhThuocLop.hoc_sinh_id.__eq__(id)).first()
-    return a
-
 def find_student_class(id):
-    # Lấy đối tượng trong bảng học sinh thuộc lớp
-    student = HocSinhThuocLop.query.order_by(HocSinhThuocLop.id.desc()).filter(HocSinhThuocLop.hoc_sinh_id.__eq__(id)).first()
-    return Lop.query.filter(Lop.id.__eq__(student.lop_id)).first()
+    student_class = HocSinhThuocLop.query.filter(HocSinhThuocLop.hoc_sinh_id.__eq__(id)).first()
+    return student_class
+
+def find_student(id):
+    student = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
+    return student
 
 # sửa thông tin học sinh
 def update_studentinfo(id, ho, ten, gioi_tinh, dia_chi, email, ngay_sinh, so_dien_thoai):
     student = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
+    print(student)
     if student:
         student.ho = ho
         student.ten = ten

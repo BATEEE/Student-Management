@@ -2,7 +2,7 @@ from flask import request, redirect, render_template, session, abort
 from functools import wraps
 import dao
 from init import app, login
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, current_user, login_required, logout_user
 from models import HocSinh
 
 
@@ -55,16 +55,18 @@ def subject():
 
 @app.route('/nv')
 @role_required(['nv'])
+@login_required
 def employee():
     return render_template('ems/employee.html')
 
 @app.route('/nv/add', methods=['get', 'post'])
 @role_required(['nv'])
+@login_required
 def add_student_process():
     theme_name = "Thêm học sinh"
-    count = str(HocSinh.query.count() + 1)
     student_id = None
     if request.method.__eq__('POST'):
+        count = str(HocSinh.query.count() + 1)
         student_id = 'HS' + '0' * (4 - len(count)) + count
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
@@ -76,24 +78,22 @@ def add_student_process():
 
         dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email, ngay_sinh=date, so_dien_thoai=contact)
 
+    count = str(HocSinh.query.count() + 1)
     return render_template("ems/add_student.html", theme_name=theme_name,
                            count=count, len_of_count=len(count))
 
 @app.route('/nv/search')
 @role_required(['nv'])
+@login_required
 def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
-    student = dao.find_student(id)
-    student_class = None
-    if student:
-        student_class = dao.find_student_class(id)
-    else:
-        error_message = "KHÔNG TÌM THẤY HỌC SINH!!!"
-    return render_template("ems/search_student.html", theme_name=theme_name, student=student, student_class=student_class)
+    student = dao.find_student_class(id)
+    return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 @app.route('/nv/update', methods=['get', 'post'])
 @role_required(['nv'])
+@login_required
 def update_student():
     student = None
     id = request.args.get('id')
@@ -152,6 +152,12 @@ def adjust_class():
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
+
+@app.route("/logout")
+@login_required
+def log_out():
+    logout_user()
+    return redirect('login')
     
 
 if __name__ == '__main__':

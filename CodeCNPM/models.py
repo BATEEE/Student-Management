@@ -46,6 +46,7 @@ class HocSinh(db.Model):
     email = Column(String(45))
     ngay_sinh = Column(Date)
     so_dien_thoai = Column(String(10))
+    avatar = Column(String(50), nullable=False)
     hoc_sinh_hoc_mon = relationship('HocSinhHocMon', backref="hoc_sinh", lazy=True)
     hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', backref="hoc_sinh", lazy=True)
 
@@ -107,14 +108,14 @@ class NhanVien(db.Model):
     so_dien_thoai = Column(String(10))
     tai_khoan_id = Column(String(10), ForeignKey('tai_khoan.id'), unique=True)
 
-    # __mapper_args__ = {
-    #     'polymorphic_identity': 'nhan_vien',
-    # }
+    def __str__(self):
+        return self.ten
 
 
 class Lop(db.Model):
     id = Column(String(10), primary_key=True)
     ten_lop = Column(String(50), nullable=False)
+    khoi_lop = Column(Integer, nullable=False)
     day = relationship('Day', backref="lop", lazy=True)
     hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', backref="lop", lazy=True)
 
@@ -161,8 +162,8 @@ class Day(db.Model):
 
 class Diem(db.Model):
     id = Column(String(10), primary_key=True)
-    ten_diem = Column(Double, nullable=False)
-    load_diem_id = Column(String(10), ForeignKey('loai_diem.id'), nullable=False)
+    so_diem = Column(Double, nullable=False)
+    loai_diem_id = Column(String(10), ForeignKey('loai_diem.id'), nullable=False)
     hoc_sinh_hoc_mon_id = Column(String(10), ForeignKey('hoc_sinh_hoc_mon.id'), nullable=False)
 
 
@@ -189,19 +190,18 @@ class GiaoVienDayMon(db.Model):
 
 if __name__ == '__main__':
     with app.app_context():
-        # db.create_all()
-        # taikhoan = TaiKhoan(id='TK02',ten_tai_khoan="Trần Tuấn Thắng", tai_khoan="admin1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
-        #                    ngay_tao="2004-2-12", email="thangancut@gmail.com", user_role=UserRole.QT)
-        # taikhoan = TaiKhoan(id='TK03',ten_tai_khoan="Nguyễn Hoàng Phúc", tai_khoan="nhanvien1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
-        #                     ngay_tao="2004-12-15", email="phuc@gmail.com", user_role=UserRole.NV)
-        # quantri = QuanTri(id='QT02', ho="Trần Tuấn", ten='Thắng', gioi_tinh=0, dia_chi="189/34/28A Bach Dang Phuong 3 Go Vap",
-        #                   email="thangdaubuoi@gmail.com", ngay_sinh="2004-3-20", so_dien_thoai="01242542", tai_khoan_id=taikhoan.id)
-        # mon_hoc = MonHoc(id=1, ten_mon_hoc="Lập trình Python")
-        # db.session.add_all([taikhoan, quantri])
-        # db.session.add(mon_hoc)
-        # nv = NhanVien(id='NV01', ho='Nguyễn Hoàng', ten='Phúc', gioi_tinh=0, dia_chi='189/34/28A Bach Dang Phuong 3 Go Vap',
-        #              email="phuc@gmail.com", ngay_sinh="2004-12-31", so_dien_thoai="01242542", tai_khoan_id=taikhoan.id)
-        # db.session.add_all([taikhoan, nv])
-        #  db.session.add(taikhoan)
-
+        db.create_all()
+        taikhoan1 = TaiKhoan(id='TK02',ten_tai_khoan="Trần Tuấn Thắng", tai_khoan="admin1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
+                            ngay_tao="2004-2-12", email="thangancut@gmail.com", user_role=UserRole.QT)
+        taikhoan2 = TaiKhoan(id='TK03',ten_tai_khoan="Nguyễn Hoàng Phúc", tai_khoan="nhanvien1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
+                             ngay_tao="2004-12-15", email="phuc@gmail.com", user_role=UserRole.NV)
+        quantri = QuanTri(id='QT02', ho="Trần Tuấn", ten='Thắng', gioi_tinh=0, dia_chi="189/34/28A Bach Dang Phuong 3 Go Vap",
+                          email="thangdaubuoi@gmail.com", ngay_sinh="2004-3-20", so_dien_thoai="01242542", tai_khoan_id=taikhoan1.id)
+        mon_hoc = MonHoc(id=1, ten_mon_hoc="Lập trình Python")
+        db.session.add_all([taikhoan1, quantri])
+        db.session.add(mon_hoc)
+        nv = NhanVien(id='NV01', ho='Nguyễn Hoàng', ten='Phúc', gioi_tinh=0, dia_chi='189/34/28A Bach Dang Phuong 3 Go Vap',
+                      email="phuc@gmail.com", ngay_sinh="2004-12-31", so_dien_thoai="01242542", tai_khoan_id=taikhoan2.id)
+        db.session.add_all([taikhoan2, nv])
+         # db.session.add(taikhoan)
         db.session.commit()
