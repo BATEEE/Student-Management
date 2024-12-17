@@ -1,3 +1,5 @@
+from wtforms.fields.simple import PasswordField
+
 from init import app,db
 from flask_admin import Admin,AdminIndexView
 from models import MonHoc,TaiKhoan
@@ -29,8 +31,10 @@ class MyAdminIndexView(AdminIndexView):
          return current_user.is_authenticated and current_user.user_role.__eq__(UserRole.QT)
     def inaccessible_callback(self, name, **kwargs):
         return abort(403)
+    def __init__(self, **kwargs):
+        super().__init__(name="Trang Chủ", **kwargs)
 
-admin = Admin(app=app, name="Trang quản trị", template_mode='bootstrap4',index_view=MyAdminIndexView())
+admin = Admin(app=app,name="Trang quản trị", template_mode='bootstrap4',index_view=MyAdminIndexView())
 
 #Chặn quyền
 class AuthenticatedView(ModelView):
@@ -40,11 +44,12 @@ class AuthenticatedView(ModelView):
 #Hien thi mon hoc
 class MonHocModelView(AuthenticatedView):
     column_display_pk = True
+    can_create = True
+    can_edit = True
     column_list = ('id', 'ten_mon_hoc')
     column_searchable_list = ['id', 'ten_mon_hoc']
     column_filters = ['id', 'ten_mon_hoc']
     can_view_details = True
-    form_columns = ['ten_mon_hoc']
     column_labels = {
         'id': 'Mã môn học',
         'ten_mon_hoc': 'Tên môn học'
@@ -52,11 +57,14 @@ class MonHocModelView(AuthenticatedView):
 
 class UserModelView(AuthenticatedView):
     can_create = True
-    column_list = ('ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role')
-    column_searchable_list = ['ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
-    column_filters = ['ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
+    can_edit = True
+    column_display_pk = True
+    column_list = ('id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role')
+    column_searchable_list = ['id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
+    column_filters = ['id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
     can_view_details = True
     column_labels = {
+        'id': 'Mã tài khoản',
         'ten_tai_khoan': 'Tên tài khoản',
         'mat_khau': 'Mật khẩu',
         'ngay_tao': 'Ngày tạo',
@@ -81,8 +89,8 @@ class StatsView(BaseView):
     def index(self):
         return self.render('admin/stats.html')
 
-admin.add_view(MonHocModelView(MonHoc, db.session))
-admin.add_view(UserModelView(TaiKhoan, db.session))
+admin.add_view(MonHocModelView(MonHoc,db.session,name='Môn Học'))
+admin.add_view(UserModelView(TaiKhoan, db.session,name='Tài khoản'))
 admin.add_view(StatsView('Thống kê - Báo cáo'))
 admin.add_view(LogoutView(name='Đăng xuất'))
 
