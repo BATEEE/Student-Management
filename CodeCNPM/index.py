@@ -2,7 +2,7 @@ from flask import request, redirect, render_template, session, abort
 from functools import wraps
 import dao
 from init import app, login
-from flask_login import login_user, current_user
+from flask_login import login_user, current_user, login_required, logout_user
 from models import HocSinh
 
 
@@ -55,11 +55,13 @@ def subject():
 
 @app.route('/nv')
 @role_required(['nv'])
+@login_required
 def employee():
     return render_template('ems/employee.html')
 
 @app.route('/nv/add', methods=['get', 'post'])
 @role_required(['nv'])
+@login_required
 def add_student_process():
     theme_name = "Thêm học sinh"
     student_id = None
@@ -82,6 +84,7 @@ def add_student_process():
 
 @app.route('/nv/search')
 @role_required(['nv'])
+@login_required
 def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
@@ -90,6 +93,7 @@ def search_student():
 
 @app.route('/nv/update', methods=['get', 'post'])
 @role_required(['nv'])
+@login_required
 def update_student():
     student = None
     id = request.args.get('id')
@@ -112,6 +116,12 @@ def update_student():
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
+
+@app.route("/logout")
+@login_required
+def log_out():
+    logout_user()
+    return redirect('login')
     
 
 if __name__ == '__main__':

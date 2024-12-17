@@ -44,6 +44,7 @@ class HocSinh(db.Model):
     email = Column(String(45))
     ngay_sinh = Column(Date)
     so_dien_thoai = Column(String(10))
+    avatar = Column(String(50), nullable=False)
     hoc_sinh_hoc_mon = relationship('HocSinhHocMon', backref="hoc_sinh", lazy=True)
     hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', backref="hoc_sinh", lazy=True)
 
