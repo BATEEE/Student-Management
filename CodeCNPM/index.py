@@ -116,7 +116,10 @@ def update_student():
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
-    
+
+def check_role():
+    if current_user.is_authenticated:
+        print(f'User Role: {current_user.user_role}')
 
 if __name__ == '__main__':
     with app.app_context():

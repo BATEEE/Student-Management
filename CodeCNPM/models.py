@@ -104,7 +104,8 @@ class NhanVien(db.Model):
     so_dien_thoai = Column(String(10))
     tai_khoan_id = Column(String(10), ForeignKey('tai_khoan.id'), unique=True)
 
-
+    def __str__(self):
+        return self.ten
     # __mapper_args__ = {
     #     'polymorphic_identity': 'nhan_vien',
     # }
