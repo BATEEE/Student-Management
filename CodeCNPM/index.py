@@ -85,12 +85,7 @@ def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
     student = dao.find_student(id)
-    student_class = None
-    if student:
-        student_class = dao.find_student_class(id)
-    else:
-        error_message = "KHÔNG TÌM THẤY HỌC SINH!!!"
-    return render_template("ems/search_student.html", theme_name=theme_name, student=student, student_class=student_class)
+    return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 @app.route('/nv/update', methods=['get', 'post'])
 @role_required(['nv'])
