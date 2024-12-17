@@ -1,4 +1,74 @@
 {% extends 'admin/master.html' %}
+
 {% block body %}
-<h1>CHÀO MỪNG ĐẾN TRANG QUẢN TRỊ!!!</h1>
+{% if current_user.is_authenticated %}
+<h1 class="text-info mt-1">CHÀO MỪNG ĐẾN VỚI TRANG QUẢN TRỊ!</h1>
+<h2 class="text-danger">Chào {{ current_user.ten_tai_khoan }}.</h2>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% else %}
+<h1 class="text-center text-info mt-1">ĐĂNG NHẬP QUẢN TRỊ</h1>
+
+<!--Test-->
+<!-- LINK icon -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <!-- LINK font Muli -->
+    <link href="https://fonts.cdnfonts.com/css/muli" rel="stylesheet" />
+    <!-- LINK CSS -->
+    <link href="{{ url_for('static', filename='css/login.css') }}" rel="stylesheet"/>
+    <!-- LINK JavaScript -->
+    <script type="text/JavaScript" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
+ <body>
+    <section>
+      <div class="properties">
+        <div class="form-box">
+          <form method="post" action="/login" class="sign-in">
+            <h2>Đăng nhập</h2>
+            <div class="input-box">
+              <ion-icon name="text-outline"></ion-icon>
+              <input type="text" name="username" id="username" required />
+              <label for="username">Tên người dùng</label>
+            </div>
+            <div class="input-box">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <ion-icon name="eye-off-outline"></ion-icon>
+              <ion-icon name="eye-outline"></ion-icon>
+              <input type="password" class="pass" id="pwd" name="password" required />
+              <label for="pwd">Mật khẩu</label>
+            </div>
+            <div class="forget">
+              <label for="forget"> <input id="forget" type="checkbox" />Lưu đăng nhập </label>
+              <a href="#">Quên mật khẩu</a>
+            </div>
+            {% if not err_msg == "" %}
+            <div class="err_msg">{{ err_msg }}</div>
+            {% endif %}
+            <button type="submit">Đăng nhập</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </body>
+
+<!--<form method="post" action="/login-admin">-->
+<!--    <div class="form-floating mb-3 mt-3">-->
+<!--        <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username" />-->
+<!--        <label for="username">Tên đăng nhập</label>-->
+<!--    </div>-->
+
+<!--    <div class="form-floating mt-3 mb-3">-->
+<!--        <input type="password" class="form-control" id="password" placeholder="Mật khẩu" name="password" />-->
+<!--        <label for="password">Mật khẩu</label>-->
+<!--    </div>-->
+<!--    <button type="submit" class="btn btn-primary">Đăng nhập</button>-->
+<!--</form>-->
+{% endif %}
 {% endblock %}

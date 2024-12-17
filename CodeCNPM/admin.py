@@ -6,7 +6,6 @@ from flask_login import current_user, logout_user
 from flask_admin import BaseView, expose
 from flask import redirect
 from models import UserRole
-import dao
 
 class MyAdminIndexView(AdminIndexView):
     @expose("/")
@@ -27,6 +26,7 @@ class MonHocModelView(ModelView):
 
 #Quản lí user
 class AuthenticatedView(ModelView):
+
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role.__eq__(UserRole.QT)
 
