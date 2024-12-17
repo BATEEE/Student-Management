@@ -21,35 +21,35 @@
         <div class="content-block flex">
             <div class="content flex">
                 <label>ID học sinh:</label>
-                <input type="text" name="" value="{{student.id}}" placeholder="" required readonly/>
+                <input type="text" name="" value="{{student.hoc_sinh.id}}" placeholder="" required readonly/>
             </div>
             <div class="content flex">
                 <label>Họ học sinh:</label>
-                <input class="editInput" type="text" name="first_name" value="{{student.ho}}" placeholder="" readonly/>
+                <input class="editInput" type="text" name="first_name" value="{{student.hoc_sinh.ho}}" placeholder="" readonly/>
             </div>
             <div class="content flex">
                 <label>Tên học sinh:</label>
-                <input class="editInput" type="text" name="last_name" value="{{student.ten}}" placeholder="" required readonly/>
+                <input class="editInput" type="text" name="last_name" value="{{student.hoc_sinh.ten}}" placeholder="" required readonly/>
             </div>
         </div>
 
         <div class="content-block flex">
             <div class="content flex">
                 <label>Nhập địa chỉ:</label>
-                <input class="editInput" type="text" name="address" value="{{student.dia_chi}}" placeholder="" required readonly/>
+                <input class="editInput" type="text" name="address" value="{{student.hoc_sinh.dia_chi}}" placeholder="" required readonly/>
             </div>
         </div>
 
         <div class="content-block flex">
             <div class="content flex">
                 <label>Ngày sinh:</label>
-                <input class="editInput" type="date" name="date" value="{{student.ngay_sinh}}" placeholder="" required readonly/>
+                <input class="editInput" type="date" name="date" value="{{student.hoc_sinh.ngay_sinh}}" placeholder="" required readonly/>
             </div>
             <div class="content flex">
                 <label for="sex">Giới tính:</label>
                 <select class="editSelect" id="sex" name="sex" disabled>
-                    <option value="0" name="nam" {% if student.gioi_tinh == 0 %}selected{% endif %}>Nam</option>
-                    <option value="1" name="nu"  {% if student.gioi_tinh == 1 %}selected{% endif %}>Nữ</option>
+                    <option value="0" name="nam" {% if student.hoc_sinh.gioi_tinh == 0 %}selected{% endif %}>Nam</option>
+                    <option value="1" name="nu"  {% if student.hoc_sinh.gioi_tinh == 1 %}selected{% endif %}>Nữ</option>
                 </select>
             </div>
         </div>
@@ -58,11 +58,11 @@
         <div class="content-block flex">
             <div class="content flex">
                 <label>Số điện thoại:</label>
-                <input class="editInput" type="tel" name="contact" value="{{student.so_dien_thoai}}" placeholder="" readonly/>
+                <input class="editInput" type="tel" name="contact" value="{{student.hoc_sinh.so_dien_thoai}}" placeholder="" readonly/>
             </div>
             <div class="content flex">
                 <label>Email:</label>
-                <input class="editInput" type="email" name="email" value="{{student.email}}" placeholder="" readonly/>
+                <input class="editInput" type="email" name="email" value="{{student.hoc_sinh.email}}" placeholder="" readonly/>
             </div>
         </div>
 

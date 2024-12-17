@@ -2,7 +2,7 @@ from flask import request, redirect, render_template, session, abort
 from functools import wraps
 import dao
 from init import app, login
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, current_user
 from models import HocSinh
 
 
@@ -116,10 +116,7 @@ def update_student():
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
-
-def check_role():
-    if current_user.is_authenticated:
-        print(f'User Role: {current_user.user_role}')
+    
 
 if __name__ == '__main__':
     with app.app_context():
