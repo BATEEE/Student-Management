@@ -2,7 +2,7 @@ from init import db, app
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String, Boolean, Date, Integer, DateTime, ForeignKey, Double, Enum
 from flask_login import UserMixin
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func,cast
 from enum import Enum as EnumRole
 from flask import redirect
 import hashlib
@@ -186,7 +186,6 @@ class GiaoVienDayMon(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     mon_hoc_id = Column(Integer, ForeignKey('mon_hoc.id'), nullable=False)
     giao_vien_id = Column(Integer, ForeignKey('giao_vien.id'), nullable=False)
-
 
 if __name__ == '__main__':
     with app.app_context():

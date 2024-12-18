@@ -93,7 +93,7 @@ def add_student_process():
 def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
-    student = dao.find_student_class(id)
+    student = dao.find_student(id)
     return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 @app.route('/nv/update', methods=['get', 'post'])
@@ -147,14 +147,14 @@ def make_profile_student():
 def create_class():
     theme_name = "Lập danh sách lớp"
     list_class = dao.get_all_class()
-    selected_id = 3
-    list_student = None
+    selected_id = 1
+    list_student = []
     number_of_class = 0
     if request.method.__eq__('GET'):
         class_id = request.args.get('class_id')
         number_of_class = request.args.get('number_of_class')
         list_student = dao.create_class(class_id=class_id, number_of_class=number_of_class)
-        print(list_student)
+        print(number_of_class)
         selected_id = class_id
     return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=selected_id, list_student=list_student
                            , number_of_class=number_of_class)
@@ -189,7 +189,21 @@ def log_out():
     logout_user()
     return redirect('login')
     
-
+#
+@app.route('/admin/get_thongke', methods=['GET'])
+def get_thongke():
+    nam_hoc = request.args.get('nam_hoc')
+    hoc_ki = request.args.get('hoc_ki')
+    monhoc = request.args.get('mon_hoc')
+    thongke=dao.thongke_DatMon(mon=monhoc,nam=nam_hoc,hocki=hoc_ki)
+    result = [
+        {
+            'ten_lop': row[0],
+            'hoc_sinh': row[1],
+            'diem_trung_binh': row[2]
+        } for row in thongke
+    ]
+    return jsonify(result)
 
 if __name__ == '__main__':
     with app.app_context():
