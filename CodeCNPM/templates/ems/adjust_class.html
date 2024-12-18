@@ -1,0 +1,67 @@
+{% extends 'layout/employee_config/base_ems.html' %}
+
+{% block content %}
+<div class="main-container">
+    <form action="/nv/add" method="post">
+        <div class="thems-text">1. Thông tin lớp</div>
+        <div class="content-block flex">
+            <div class="content flex">
+                <label for="class">Lớp:</label>
+                <select name="class" id="class">
+                    <option name="" value="">10A1</option>
+                </select>
+            </div>
+
+            <div class="content flex">
+                <label for="class">Sĩ số:</label>
+                <input type="number" name="" value="0" readonly/>
+            </div>
+        </div>
+    </form>
+
+    <div class="table">
+        <table>
+
+            <thead>
+            <tr>
+                <th>STT</th>
+                <th>Họ và Tên</th>
+                <th>Giới tính</th>
+                <th>Năm sinh</th>
+                <th>Địa chỉ</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="delete-student"><button type="submit">x</button></td>
+            </tr>
+            </tbody>
+
+        </table>
+    </div>
+    <div class="table-func">
+        <button onclick="">Hủy</button>
+        <button onclick="AddStudentFunc()" id="add-button">Thêm</button>
+        <button onclick="">Lưu</button>
+    </div>
+
+    <div class="add-into-list">
+        <div class="content-block flex">
+            <div class="content flex">
+                <label for="class">Nhập id học sinh:</label>
+                <input type="text" name="" placeholder=""/>
+            </div>
+        </div>
+        <div class="table-func">
+            <button onclick="AddStudentFunc()">Hủy</button>
+            <button onclick="AddStudentList()">Thêm</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

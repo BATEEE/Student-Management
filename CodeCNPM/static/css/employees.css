@@ -31,7 +31,7 @@ main {
 
 .content-block {
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     margin: 1.7rem;
     gap: 1rem;
 }
@@ -55,7 +55,7 @@ main {
     color: #4F5467
 }
 
-.main-container button,
+.main-container .button,
 .main-container .edit-student {
     padding: 1rem 1.5rem;
     margin-left: auto;
@@ -70,7 +70,7 @@ main {
     cursor: pointer;
 }
 
-.main-container button:hover,
+.main-container .button:hover,
  .main-container .edit-student:hover {
     background: #1c5edf;
     box-shadow: 0.5px 0.5px 5px gray;
@@ -112,11 +112,74 @@ main {
 }
 
 /*  update  */
-.main-container .edit-student {
+.main-container .edit-student,
+.main-container .make_profile_student {
     margin-left: 1.7rem;
 }
 
 .error-message {
     padding-left: 1.7rem;
     color: red;
+}
+
+/* LẬP DANH SÁCH LỚP */
+.table {
+    text-align: center;
+    padding-inline: 1.7rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, td {
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center;
+}
+
+.table th {
+    font-weight: bold;
+}
+
+.table-func {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.table-func button {
+    padding: 1rem 1.5rem;
+    margin-right: 1.7rem;
+    margin-block: 1.5rem;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    background: #1a73e8;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.table tr td.delete-student {
+    border: none;
+    padding: 0;
+}
+
+.table tr td>button {
+    padding-block: 3px;
+    padding-inline: 8px;
+    border: none;
+    font-weight: 700;
+    color: #fff;
+    background-color: red;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.add-into-list {
+    display: none;
+}
+
+.add-into-list.toggle-block {
+    display: block;
 }

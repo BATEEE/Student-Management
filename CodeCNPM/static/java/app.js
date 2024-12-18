@@ -63,6 +63,7 @@ function toggleEditStudent() {
                 select.removeAttribute("disabled");
             }
         })
+<<<<<<< HEAD
     }
 
 //Load hoc ki
@@ -81,5 +82,26 @@ function loadHocKi() {
             });
         })
         .catch(error => console.error('Error:', error));
+}
+
+
+}
+
+// Thêm học sinh vào danh sách lớp
+function AddStudentFunc() {
+    addContainer = document.querySelector('.add-into-list')
+    addButton = document.getElementById('add-button')
+    addContainer.classList.toggle('toggle-block')
+
+    if (addContainer.classList.contains('toggle-block')) {
+        addButton.style.filter = 'brightness(50%)';
+        addButton.style.pointerEvents = 'none';
+    } else {
+        addButton.style.filter = 'brightness(100%)';
+        addButton.style.pointerEvents = 'auto';
+    }
+}
+
+function AddStudentList() {
 }
 
