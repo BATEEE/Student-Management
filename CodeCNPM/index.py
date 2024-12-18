@@ -1,9 +1,9 @@
-from flask import request, redirect, render_template, session, abort
+from flask import request, redirect, render_template, session, abort,jsonify
 from functools import wraps
 import dao
-from init import app, login
+from init import app, login,db
 from flask_login import login_user, current_user
-from models import HocSinh
+from models import HocSinh,ThongTinNamHoc,Lop
 
 
 @app.route("/")
@@ -111,7 +111,17 @@ def update_student():
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
-    
+
+
+@app.route('/admin/get_hocki', methods=['GET'])
+def get_hocki():
+    nam_hoc = request.args.get('nam_hoc')
+    hocki_list = db.session.query(
+        ThongTinNamHoc.hoc_ki
+    ).filter(ThongTinNamHoc.nam_hoc == nam_hoc).distinct().all()
+    result = [row[0] for row in hocki_list]
+    return jsonify(result)
+
 
 if __name__ == '__main__':
     with app.app_context():

@@ -64,3 +64,22 @@ function toggleEditStudent() {
             }
         })
     }
+
+//Load hoc ki
+function loadHocKi() {
+    const namHoc = document.getElementById("namhoc_select").value;
+    fetch(`/admin/get_hocki?nam_hoc=${namHoc}`)
+        .then(res => res.json())
+        .then(data => {
+            let hocKiSelect = document.getElementById("hocki_select");
+            hocKiSelect.innerHTML = "<option disabled selected>Chọn học kì</option>";
+            data.forEach(hoc_ki => {
+                let option = document.createElement("option");
+                option.value = hoc_ki;
+                option.text = `${hoc_ki}`;
+                hocKiSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+}
+

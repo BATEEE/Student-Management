@@ -1,5 +1,6 @@
 from wtforms.fields.simple import PasswordField
 
+from dao import get_monhoc, get_hocki, get_namhoc
 from init import app,db
 from flask_admin import Admin,AdminIndexView
 from models import MonHoc,TaiKhoan
@@ -87,11 +88,14 @@ class LogoutView(MyView):
 class StatsView(BaseView):
     @expose('/')
     def index(self):
-        return self.render('admin/stats.html')
+        monhoc=dao.get_monhoc()
+        hocki=dao.get_hocki()
+        namhoc=dao.get_namhoc()
+        return self.render('admin/stats.html',monhoc=monhoc,hocki=hocki,namhoc=namhoc)
 
 admin.add_view(MonHocModelView(MonHoc,db.session,name='Môn Học'))
 admin.add_view(UserModelView(TaiKhoan, db.session,name='Tài khoản'))
-admin.add_view(StatsView('Thống kê - Báo cáo'))
+admin.add_view(StatsView(name='Thống kê - Báo cáo'))
 admin.add_view(LogoutView(name='Đăng xuất'))
 
 

@@ -58,5 +58,16 @@ def update_studentinfo(id, ho, ten, gioi_tinh, dia_chi, email, ngay_sinh, so_die
         student.so_dien_thoai = so_dien_thoai
         db.session.commit()
 
+#Lay du lieu mon hoc
+def get_monhoc():
+    return db.session.query(MonHoc.ten_mon_hoc)
+
+#Lay du lieu hoc ki
+def get_hocki():
+    return db.session.query(ThongTinNamHoc.hoc_ki).distinct()
+
+#lay du lieu nam hoc
+def get_namhoc():
+    return db.session.query(ThongTinNamHoc.nam_hoc).distinct()
 # Thống kê
 

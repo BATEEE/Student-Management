@@ -1,4 +1,26 @@
 {% extends 'admin/master.html' %}
 {% block body %}
-<h1>Thống kê </h1>
+ <script type="text/JavaScript" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
+<h1 class="text-danger text-center mt-1">Thống kê </h1>
+
+<select id="monhoc_select" class="form-select form-select-lg">
+    <option disabled selected>Chọn môn học</option>
+    {% for mh in monhoc %}
+  <option>{{mh[0]}}</option>
+    {% endfor %}
+</select>
+
+<select id="namhoc_select" onchange="loadHocKi()" class="form-select form-select-lg">
+    <option disabled selected>Chọn năm học</option>
+    {% for nh in namhoc %}
+  <option>{{nh[0]}}</option>
+    {% endfor %}
+</select>
+
+<select id="hocki_select" class="form-select form-select-lg">
+    <option disabled selected>Chọn học kì</option>
+<!--    {% for hk in hocki %}-->
+<!--  <option>{{hk[0]}}</option>-->
+<!--    {% endfor %}-->
+</select>
 {% endblock %}
