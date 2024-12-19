@@ -158,7 +158,7 @@ def make_profile_student():
 @login_required
 def create_class():
     theme_name = "Lập danh sách lớp"
-    list_class = dao.get_all_class()
+    list_class = dao.get_all_class([10])
     number_of_class = session.get('number_of_class')
     if not number_of_class:
         session['number_of_class'] = 0
@@ -168,7 +168,12 @@ def create_class():
     if request.method.__eq__('GET') and 'number_of_class' in request.args:
         session['class_id'] = request.args.get('class_id')
         session['number_of_class'] = request.args.get('number_of_class')
+        if int(session['number_of_class']) > 40:
+            session['number_of_class'] = 40
+        elif int(session['number_of_class']) <= 0:
+            session['number_of_class'] = 1
         list_student = dao.create_class(class_id=session['class_id'], number_of_class=session['number_of_class'])
+        session['number_of_class'] = len(list_student)
         list_student_js = []
         for i in list_student:
             student = {

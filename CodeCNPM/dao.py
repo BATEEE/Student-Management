@@ -52,8 +52,8 @@ def find_student(id):
     return student
 
 # Lay danh sach lop hoc
-def get_all_class():
-    return Lop.query.all()
+def get_all_class(khoi_lop=[10, 11, 12]):
+    return Lop.query.filter(Lop.khoi_lop.in_(khoi_lop)).all()
 
 # Them hoc sinh vao lop
 def add_student_into_class(list_student, class_id):
@@ -68,7 +68,7 @@ def create_class(number_of_class, class_id):
     student_of_class = HocSinhThuocLop.query.all() # Lấy danh sách học sinh đã có lớp
     new_students = [x.hoc_sinh_id for x in student_of_class] # Lọc học sinh đã có lớp và học sinh chưa có
     # random từ danh sách học sinh bỏ đi danh sách học sinh của new student vì chỉ cần lấy danh sách học sinh chưa có lớp
-    random_student = (HocSinh.query.filter(HocSinh.id.notin_(new_students)).order_by(func.random()).limit(number_of_class).all())
+    random_student = (HocSinh.query.filter(HocSinh.id.notin_(new_students)).order_by(func.random()).order_by(HocSinh.ten.asc()).limit(number_of_class).all())
     return random_student
 
 # sửa thông tin học sinh
