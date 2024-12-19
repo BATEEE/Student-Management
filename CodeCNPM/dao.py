@@ -1,6 +1,8 @@
 from fileinput import hook_compressed
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import query_expression
+
 from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc, HocSinh, HocSinhThuocLop, Lop, LoaiDiem, Diem, \
     HocSinhHocMon, ThongTinNamHoc
 from init import db, NAMHOC, HOCKY
@@ -17,6 +19,8 @@ def auth_login(username, password):
 def add_user(username, password, role):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     n = TaiKhoan.query.count() # so luong user trong Tai Khoan
+
+
 
 
 # thêm môn học
@@ -59,6 +63,9 @@ def add_student_into_class(list_student, class_id):
         db.session.add(hoc_sinh_thuoc_lop)
         db.session.commit()
 
+def add_student_into_class(student_id, class_id):
+    pass
+
 # Tao danh sach lop
 def create_class(number_of_class, class_id):
     student_of_class = HocSinhThuocLop.query.all() # Lấy danh sách học sinh đã có lớp
@@ -93,5 +100,24 @@ def get_hocki():
 #lay du lieu nam hoc
 def get_namhoc():
     return db.session.query(ThongTinNamHoc.nam_hoc).distinct()
+
 # Thống kê
+def thongke_DatMon(mon=None,nam=None,hocki=None):
+    query= ((((db.session.query(
+        Lop.ten_lop.label('ten_lop'),
+        HocSinh.id.label('id_hoc_sinh')
+        ,(func.sum(Diem.so_diem * LoaiDiem.he_so) / func.sum(LoaiDiem.he_so)).label('diem_trung_binh'))
+            .join(HocSinhThuocLop, HocSinhThuocLop.lop_id == Lop.id)
+            .join(HocSinh, HocSinhThuocLop.hoc_sinh_id == HocSinh.id)
+            .join(HocSinhHocMon, HocSinhHocMon.hoc_sinh_id == HocSinh.id)
+            .join(Diem, Diem.hoc_sinh_hoc_mon_id == HocSinhHocMon.id)
+            .join(LoaiDiem, Diem.loai_diem_id == LoaiDiem.id)
+            .join(MonHoc, HocSinhHocMon.mon_hoc_id == MonHoc.id)
+            .join(ThongTinNamHoc, HocSinhHocMon.thong_tin_nam_hoc_id == ThongTinNamHoc.id))
+            .filter(MonHoc.ten_mon_hoc.__eq__(mon)))
+            .filter(ThongTinNamHoc.nam_hoc.__eq__(nam)))
+            .filter(ThongTinNamHoc.hoc_ki.__eq__(hocki)))
+    query=query.group_by(Lop.ten_lop,HocSinh.id)
+    return query.all()
+
 
