@@ -86,11 +86,134 @@ function loadHocKi() {
         .catch(error => console.error('Error:', error));
 }
 
+function updateTableUI(data) {
+    let row = document.getElementById("rows");
+    let tr = document.createElement('tr')
+
+    let td_id = document.createElement('td')
+    td_id.textContent = data.id
+
+    let td_name = document.createElement('td')
+    td_name.textContent = data.name
+
+    let td_sex = document.createElement('td')
+    td_sex.textContent = data.sex
+
+    let td_year = document.createElement('td')
+    td_year.textContent = data.year
+
+    let td_address = document.createElement('td')
+    td_address.textContent = data.address
+
+    row.appendChild(tr)
+    tr.appendChild(td_id)
+    tr.appendChild(td_name)
+    tr.appendChild(td_sex)
+    tr.appendChild(td_year)
+    tr.appendChild(td_address)
+}
+
+function addToTable() {
+    number_of_class = document.getElementById('number_of_class')?.value
+    class_id = document.getElementById('class')?.value
+    if (!number_of_class || !class_id) {
+        console.error("Missing input values");
+        return; // Dừng hàm nếu thiếu dữ liệu
+    }
+        console.log(`/nv/create_class?class_id=${class_id}&number_of_class=${number_of_class}`)
+    fetch(`/nv/create_class?class_id=${class_id}&number_of_class=${number_of_class}`, {
+        method: "GET",
+//        body: JSON.stringify({
+//            id: 'id',
+//            name: 'name',
+//            sex: 'sex',
+//            year: 'year',
+//            address: 'address'
+//        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(res => res.json()).then(data => {
+        console.log(data)
+        updateTableUI(data);
+    }).catch(error => {
+        console.error("Fetch error:", error);
+    });
+}
 
 // xóa học sinh khỏi bảng danh sách lớp
 function deleteStudentFromTable(id) {
-    id.remove()
+    if (confirm("Bạn chắc chắn xóa không?") === true) {
+        fetch(`/api/create_class/${id}`, {
+            method: "delete"
+        }).then(res => res.json()).then(data => {
+            alert(data.message)
+            document.getElementById(`Student${id}`).style.display = "none";
+
+        }).catch(error => {
+            alert("Có lỗi xảy ra. Vui lòng thử lại.");
+        });
+    }
 }
+
+function deleteStudentFromTableNoConfirm(id) {
+        fetch(`/api/create_class/${id}`, {
+            method: "delete"
+        }).then(res => res.json()).then(data => {
+            document.getElementById(`Student${id}`).style.display = "none";
+
+        }).catch(error => {
+            alert("Có lỗi xảy ra. Vui lòng thử lại.");
+        });
+}
+
+function deleteAllStudentFromTable() {
+    if (confirm("Bạn chắc chắn xóa không?") === true) {
+        row = document.getElementById('rows')
+        rows = row.querySelectorAll('tr')
+        rows.forEach(item => {
+            id = item.querySelector('td').textContent
+            console.log(id)
+            deleteStudentFromTableNoConfirm(id)
+        })
+    }
+}
+
+
+//function addStudentToTable() {
+//    class_id = document.getElementById('class_id')
+//    number_of_class = document.getElementById('number_of_class')
+//    fetch(`/nv/create_class?class_id=${class_id}&number_of_class=${number_of_class})`,{
+//        method: 'POST',
+//        headers: {
+//            'Content-Type': 'application/json',
+//        }
+//    })
+//    .then(response => response.json())
+//    .then(data => {
+//         row = document.getElementById('rows')
+//         console.log(data)
+//         if(data) {
+//            data.forEach(item -> {
+//                a = "<tr id='{{i.id}}'> <td>{{i.id}}</td><td>{{i.ho + " " + i.ten}}</td><td>{{'Nam' if i.gioi_tinh == 0 else 'Nữ'}}</td><td>{{i.ngay_sinh.year}}</td><td>{{i.dia_chi}}</td><td class='delete-student'><button class='btn-delete' type='button' onclick='deleteStudentFromTable({{i.id}})'>x</button></td></tr>"
+//
+//            })
+//         }
+//     });
+//}
+//         else {
+//            const tr = document.createElement('tr');
+//            const td = document.createElement('td');
+//            td.setAttribute('colspan', '5');
+//            td.textContent = 'Không có dữ liệu thống kê.';
+//            tr.appendChild(td);
+//            tbody.appendChild(tr);
+//            }
+//            })
+//    .catch(error => {
+//        console.error('Error:', error);
+//    });
+//}
 
 
 //add_student_table
@@ -186,7 +309,7 @@ function thongke(){
             alert("Vui lòng chọn dầy đủ năm học, học kì, môn học!")
             return
         }
-       fetch(`/admin/get_thongke?nam_hoc=${nam}&hoc_ki=${hocki}&mon_hoc=${mon}`,{
+    fetch(`/admin/get_thongke?nam_hoc=${nam}&hoc_ki=${hocki}&mon_hoc=${mon}`,{
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
