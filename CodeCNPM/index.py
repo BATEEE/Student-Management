@@ -93,7 +93,7 @@ def add_student_process():
 def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
-    student = dao.find_student(id)
+    student = dao.find_student_class(id)
     return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 @app.route('/nv/update', methods=['get', 'post'])
@@ -151,19 +151,18 @@ def create_class():
     list_class = dao.get_all_class()
     if request.method.__eq__('GET') and 'number_of_class' in request.args:
         number_of_class = request.args.get('number_of_class')
-    selected_id = 1
-    list_student = []
-    number_of_class = 0
-    if request.method.__eq__('GET'):
         class_id = request.args.get('class_id')
         list_student = dao.create_class(class_id=class_id, number_of_class=number_of_class)
-        return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=int(class_id),
+        #session['list_student'] = list_student
+        return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class,
+                               selected_id=int(class_id),
                                list_student=list_student
                                , number_of_class=number_of_class)
     elif request.method.__eq__('POST'):
         number_of_class = request.args.get('number_of_class')
         list_student = dao.create_class(class_id=class_id, number_of_class=number_of_class)
         dao.add_student_into_class(list_student=list_student, class_id=class_id)
+        session['list_student'] = []
     return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=1, list_student=[]
                            , number_of_class=0)
 
