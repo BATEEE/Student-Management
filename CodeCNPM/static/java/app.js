@@ -93,6 +93,9 @@ function deleteStudentFromTable(id) {
 }
 
 
+//add_student_table
+
+
 // Thêm học sinh vào danh sách lớp
 function AddStudentFunc() {
     addContainer = document.querySelector('.add-into-list')
@@ -107,6 +110,67 @@ function AddStudentFunc() {
         addButton.style.pointerEvents = 'auto';
     }
 }
+//Điều chỉnh danh lớp
+document.addEventListener('DOMContentLoaded', function() {
+    loadSiSo();
+});
+
+function loadSiSo(){
+    const selectElement=document.getElementById('class')
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const siSo=selectedOption.getAttribute("data-siso");
+    const updateSiSo=document.getElementById('siso')
+    updateSiSo.value=siSo
+    const idLop = selectElement.options[selectElement.selectedIndex].id;
+
+    fetch(`/nv/adjust_class/get_listStudent?id_lop=${idLop}`,{
+    method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data)
+            {
+            const rowStudent=document.getElementById('hocsinh')
+            rowStudent.innerHTML=""
+            let dem=1;
+            data.forEach(item =>{
+
+            const tr = document.createElement('tr');
+            const tdStt = document.createElement('td');
+            const tdHoTen = document.createElement('td');
+            const tdGioiTinh = document.createElement('td');
+            const tdNgaySinh = document.createElement('td');
+            const tdDiaChi=document.createElement('td')
+
+            tdStt.textContent=dem++
+            tdHoTen.textContent=item.ho+" "+item.ten
+            tdGioiTinh.textContent=item.gioi_tinh ? "Nữ" : "Nam"
+            tdNgaySinh.textContent=item.ngay_sinh
+            tdDiaChi.textContent=item.dia_chi
+
+            tr.appendChild(tdStt)
+            tr.appendChild(tdHoTen)
+            tr.appendChild(tdGioiTinh)
+            tr.appendChild(tdNgaySinh)
+            tr.appendChild(tdDiaChi);
+
+            let tdElement = document.createElement('td');
+            tdElement.classList.add('delete-student');
+            let buttonElement = document.createElement('button');
+            buttonElement.setAttribute('type', 'submit');
+            buttonElement.textContent = 'x';
+            tdElement.appendChild(buttonElement);
+            tr.appendChild(tdElement)
+            rowStudent.appendChild(tr)
+            })
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+//
 
 function AddStudentList() {
 }

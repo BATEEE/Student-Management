@@ -4,7 +4,7 @@ import dao
 
 from init import app, login,db
 from flask_login import login_user, current_user
-from models import HocSinh,ThongTinNamHoc,Lop
+from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop
 from init import app, login
 from flask_login import login_user, current_user, login_required, logout_user
 from models import HocSinh
@@ -166,13 +166,28 @@ def create_class():
     return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=1, list_student=[]
                            , number_of_class=0)
 
-
+#Dieu chinh lop
 @app.route('/nv/adjust_class')
 @role_required(['nv'])
 @login_required
 def adjust_class():
     theme_name = "Điều chỉnh danh sách lớp"
-    return render_template('ems/adjust_class.html', theme_name=theme_name)
+    danhsachlop=dao.get_hocsinh_lop()
+    return render_template('ems/adjust_class.html', theme_name=theme_name,danhsachlop=danhsachlop)
+
+@app.route('/nv/adjust_class/get_listStudent',methods=['GET'])
+def get_hocSinhTheoLop():
+    idLop=request.args.get('id_lop')
+    result=dao.get_listHocSinh_lop(idLop)
+    listStudent = [{
+        'id': student.id,
+        'ho': student.ho,
+        'ten': student.ten,
+        'gioi_tinh': student.gioi_tinh,
+        'ngay_sinh': student.ngay_sinh.strftime('%d-%m-%Y'),
+        'dia_chi': student.dia_chi
+    } for student in result]
+    return jsonify(listStudent)
 
 @login.user_loader
 def load_user(user_id):
@@ -211,6 +226,7 @@ def get_thongke():
         } for row in thongke
     ]
     return jsonify(result)
+
 
 if __name__ == '__main__':
     with app.app_context():

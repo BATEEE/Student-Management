@@ -7,14 +7,16 @@
         <div class="content-block flex">
             <div class="content flex">
                 <label for="class">Lớp:</label>
-                <select name="class" id="class">
-                    <option name="" value="">10A1</option>
+                <select name="class" id="class" onchange="loadSiSo()">
+                    {% for ds in danhsachlop %}
+                       <option  id="{{ds.id}}" data-siso="{{ds.siso}}">{{ds.ten_lop}}</option>
+                    {% endfor  %}
                 </select>
             </div>
 
             <div class="content flex">
                 <label for="class">Sĩ số:</label>
-                <input type="number" name="" value="0" readonly/>
+                <input type="number" name="" value="{{danhsachlop[0].siso}}" id="siso" readonly/>
             </div>
         </div>
     </form>
@@ -32,14 +34,10 @@
             </tr>
             </thead>
 
-            <tbody>
+            <tbody id="hocsinh">
             <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="delete-student"><button type="submit">x</button></td>
+
+<!--            <td class="delete-student"><button type="submit">x</button></td>-->
             </tr>
             </tbody>
 

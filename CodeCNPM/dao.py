@@ -117,4 +117,15 @@ def thongke_DatMon(mon=None,nam=None,hocki=None):
     query=query.group_by(Lop.ten_lop,HocSinh.id)
     return query.all()
 
+#Lay cac lop da co hoc sinh
+def get_hocsinh_lop():
+      return (db.session.query(Lop.id,Lop.ten_lop,func.count(HocSinhThuocLop.hoc_sinh_id).label('siso'))
+            .join(HocSinhThuocLop,Lop.id==HocSinhThuocLop.lop_id)
+            .join(HocSinh,HocSinhThuocLop.hoc_sinh_id==HocSinh.id).group_by(Lop.id,Lop.ten_lop).distinct().all())
+#Lay danh hoc sinh theo lop
+def get_listHocSinh_lop(idlop):
+      return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi).join(HocSinhThuocLop,HocSinhThuocLop.hoc_sinh_id==HocSinh.id)
+              .join(Lop,HocSinhThuocLop.lop_id.__eq__(Lop.id))).filter(Lop.id.__eq__(idlop)).all()
+
+
 
