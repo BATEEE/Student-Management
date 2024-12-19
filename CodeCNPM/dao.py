@@ -63,9 +63,6 @@ def add_student_into_class(list_student, class_id):
         db.session.add(hoc_sinh_thuoc_lop)
         db.session.commit()
 
-def add_student_into_class(student_id, class_id):
-    pass
-
 # Tao danh sach lop
 def create_class(number_of_class, class_id):
     student_of_class = HocSinhThuocLop.query.all() # Lấy danh sách học sinh đã có lớp
