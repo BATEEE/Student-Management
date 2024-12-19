@@ -70,6 +70,7 @@ function toggleEditStudent() {
 //Load hoc ki
 function loadHocKi() {
     const namHoc = document.getElementById("namhoc_select").value;
+
     fetch(`/admin/get_hocki?nam_hoc=${namHoc}`)
         .then(res => res.json())
         .then(data => {
