@@ -3,7 +3,7 @@ from fileinput import hook_compressed
 from flask_sqlalchemy import SQLAlchemy
 from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc, HocSinh, HocSinhThuocLop, Lop, LoaiDiem, Diem, \
     HocSinhHocMon, ThongTinNamHoc
-from init import db
+from init import db, NAMHOC, HOCKY
 from sqlalchemy import func, asc
 from datetime import datetime
 import hashlib
@@ -36,7 +36,11 @@ def get_user_by_id(id):
     return TaiKhoan.query.get(id)
 
 def find_student_class(id):
-    student_class = HocSinhThuocLop.query.filter(HocSinhThuocLop.hoc_sinh_id.__eq__(id)).first()
+    student_class = HocSinhThuocLop.query \
+        .filter(HocSinhThuocLop.hoc_sinh_id == id) \
+        .join(HocSinhThuocLop.thong_tin_nam_hoc) \
+        .order_by(ThongTinNamHoc.nam_hoc.desc(), ThongTinNamHoc.hoc_ki.desc()) \
+        .first()
     return student_class
 
 def find_student(id):
@@ -48,8 +52,12 @@ def get_all_class():
     return Lop.query.all()
 
 # Them hoc sinh vao lop
-def add_student_into_class(student_id, class_id):
-    hoc_sinh_thuoc_lop
+def add_student_into_class(list_student, class_id):
+    thong_tin_nam_hoc = ThongTinNamHoc.query.filter(ThongTinNamHoc.nam_hoc.__eq__(NAMHOC), ThongTinNamHoc.hoc_ki.__eq__(HOCKY)).first()
+    for i in list_student:
+        hoc_sinh_thuoc_lop = HocSinhThuocLop(hoc_sinh_id=i.id, lop_id=class_id, thong_tin_nam_hoc_id=thong_tin_nam_hoc.id)
+        db.session.add(hoc_sinh_thuoc_lop)
+        db.session.commit()
 
 # Tao danh sach lop
 def create_class(number_of_class, class_id):

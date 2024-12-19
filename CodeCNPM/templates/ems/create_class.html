@@ -9,53 +9,59 @@
                 <label for="class">Chọn lớp:</label>
                 <select name="class_id" id="class">
                     {%for i in list_class%}
-                    <option name="" value="{{i.id}}" {% if selected_id.__eq__(i.id) %} selected {% endif %}>{{i.ten_lop}}</option>
+                    <option name="" value={{i.id}} {% if selected_id.__eq__(i.id) %} selected {% endif %}>
+                        {{i.ten_lop}}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="content flex">
                 <label for="class">Nhập sĩ số:</label>
-                <input type="number" value="{{number_of_class}}" name="number_of_class" placeholder="" />
+                <input type="number" value={{number_of_class}} name="number_of_class" placeholder="" required/>
             </div>
         </div>
 
         <button type="submit" value="" class="make_profile_student button" onclick="">Tạo danh sách</button>
     </form>
 
-    <div class="table">
-        <table>
+    <form action="/nv/create_class" method="post">
+        <div class="table">
+            <table>
 
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Họ và Tên</th>
-                <th>Giới tính</th>
-                <th>Năm sinh</th>
-                <th>Địa chỉ</th>
-            </tr>
-            </thead>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Họ và Tên</th>
+                    <th>Giới tính</th>
+                    <th>Năm sinh</th>
+                    <th>Địa chỉ</th>
+                </tr>
+                </thead>
 
-            <tbody>
-            {% for i in list_student%}
-            <tr>
-                <td>{{i.id}}</td>
-                <td>{{i.ho + " " + i.ten}}</td>
-                <td>{{"Nam" if i.gioi_tinh == 0 else "Nữ"}}</td>
-                <td>{{i.ngay_sinh.year}}</td>
-                <td>{{i.dia_chi}}</td>
-                <td class="delete-student"><button type="submit">x</button></td>
-            </tr>
-            {% endfor %}
-            </tbody>
+                <tbody>
+                {% for i in list_student%}
+                <tr id="{{i.id}}">
+                    <td>{{i.id}}</td>
+                    <td>{{i.ho + " " + i.ten}}</td>
+                    <td>{{"Nam" if i.gioi_tinh == 0 else "Nữ"}}</td>
+                    <td>{{i.ngay_sinh.year}}</td>
+                    <td>{{i.dia_chi}}</td>
+                    <td class="delete-student">
+                        <button class="btn-delete" type="button" onclick="deleteStudentFromTable({{i.id}})">x</button>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
 
-        </table>
-    </div>
-    <div class="table-func">
-        <button onclick="">Hủy</button>
-        <button onclick="AddStudentFunc()" id="add-button">Thêm</button>
-        <button type="submit" onclick="">Lưu</button>
-    </div>
+            </table>
+        </div>
+        <div class="table-func">
+            <button type="button" onclick="">Hủy</button>
+            <button type="button" onclick="AddStudentFunc()" id="add-button">Thêm</button>
+            <button type="submit" onclick="">Lưu</button>
+        </div>
+    </form>
 
     <div class="add-into-list">
         <div class="content-block flex">

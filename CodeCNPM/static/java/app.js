@@ -63,7 +63,6 @@ function toggleEditStudent() {
                 select.removeAttribute("disabled");
             }
         })
-<<<<<<< HEAD
     }
 
 //Load hoc ki
@@ -84,7 +83,9 @@ function loadHocKi() {
         .catch(error => console.error('Error:', error));
 }
 
-
+// xóa học sinh khỏi bảng danh sách lớp
+function deleteStudentFromTable(id) {
+    id.remove()
 }
 
 // Thêm học sinh vào danh sách lớp

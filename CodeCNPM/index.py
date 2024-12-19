@@ -119,7 +119,7 @@ def update_student():
     return render_template("ems/update_student.html", theme_name=theme_name, student=student)
 
 
-@app.route('/nv/make_profile')
+@app.route('/nv/make_profile', methods=['get', 'post'])
 @role_required(['nv'])
 @login_required
 def make_profile_student():
@@ -141,23 +141,27 @@ def make_profile_student():
     return render_template("ems/make_profile_student.html", theme_name=theme_name,
                            count=count, len_of_count=len(count))
 
+class_id = 0
 @app.route('/nv/create_class', methods=['get', 'post'])
 @role_required(['nv'])
 @login_required
 def create_class():
+    global class_id
     theme_name = "Lập danh sách lớp"
     list_class = dao.get_all_class()
-    selected_id = 3
-    list_student = None
-    number_of_class = 0
-    if request.method.__eq__('GET'):
+    if request.method.__eq__('GET') and 'number_of_class' in request.args:
+        number_of_class = request.args.get('number_of_class')
         class_id = request.args.get('class_id')
+        list_student = dao.create_class(class_id=class_id, number_of_class=number_of_class)
+        return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=int(class_id),
+                               list_student=list_student
+                               , number_of_class=number_of_class)
+    elif request.method.__eq__('POST'):
         number_of_class = request.args.get('number_of_class')
         list_student = dao.create_class(class_id=class_id, number_of_class=number_of_class)
-        print(list_student)
-        selected_id = class_id
-    return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=selected_id, list_student=list_student
-                           , number_of_class=number_of_class)
+        dao.add_student_into_class(list_student=list_student, class_id=class_id)
+    return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=1, list_student=[]
+                           , number_of_class=0)
 
 
 @app.route('/nv/adjust_class')
