@@ -1,8 +1,11 @@
+from importlib.metadata import requires
+
 from wtforms.fields.simple import PasswordField
 
+from dao import get_monhoc, get_hocki, get_namhoc, thongke_DatMon
 from init import app,db
 from flask_admin import Admin,AdminIndexView
-from models import MonHoc,TaiKhoan
+from models import MonHoc, TaiKhoan, HocSinh
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, logout_user
 from flask_admin import BaseView, expose
@@ -10,6 +13,7 @@ from flask import redirect,abort,url_for,session
 from models import UserRole
 from functools import wraps
 import dao
+from wtforms.validators import DataRequired
 
 
 def role_required(allowed_roles):
@@ -34,7 +38,7 @@ class MyAdminIndexView(AdminIndexView):
     def __init__(self, **kwargs):
         super().__init__(name="Trang Chủ", **kwargs)
 
-admin = Admin(app=app,name="Trang quản trị", template_mode='bootstrap4',index_view=MyAdminIndexView())
+admin = Admin(app,name="Trang quản trị", template_mode='bootstrap4',index_view=MyAdminIndexView())
 
 #Chặn quyền
 class AuthenticatedView(ModelView):
@@ -59,9 +63,9 @@ class UserModelView(AuthenticatedView):
     can_create = True
     can_edit = True
     column_display_pk = True
-    column_list = ('id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role')
+    column_list =            ('id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role')
     column_searchable_list = ['id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
-    column_filters = ['id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
+    column_filters =         ['id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
     can_view_details = True
     column_labels = {
         'id': 'Mã tài khoản',
@@ -87,11 +91,15 @@ class LogoutView(MyView):
 class StatsView(BaseView):
     @expose('/')
     def index(self):
-        return self.render('admin/stats.html')
+        monhoc=dao.get_monhoc()
+        hocki=dao.get_hocki()
+        namhoc=dao.get_namhoc()
+        thongke_DatMon=dao.thongke_DatMon()
+        return self.render('admin/stats.html',monhoc=monhoc,hocki=hocki,namhoc=namhoc,thongke_DatMon=thongke_DatMon)
 
 admin.add_view(MonHocModelView(MonHoc,db.session,name='Môn Học'))
 admin.add_view(UserModelView(TaiKhoan, db.session,name='Tài khoản'))
-admin.add_view(StatsView('Thống kê - Báo cáo'))
+admin.add_view(StatsView(name='Thống kê - Báo cáo'))
 admin.add_view(LogoutView(name='Đăng xuất'))
 
 
