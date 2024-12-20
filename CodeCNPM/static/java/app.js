@@ -591,3 +591,14 @@ function thongBaoThemHocSinh(msg) {
 //    }
     console.log(1)
 }
+
+function generateTable() {
+
+            phut_15 = document.getElementById('15p').value
+            phut_45 = document.getElementById('45p').value
+            col_15 = document.getElementById('col_15')
+            col_45 = document.getElementById('col_45')
+            col_15.setAttribute('colspan', phut_15)
+            col_45.setAttribute('colspan', phut_45)
+
+}

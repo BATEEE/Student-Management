@@ -8,7 +8,6 @@ from flask import redirect
 import hashlib
 import datetime
 
-
 class UserRole(EnumRole):
     GV = "GiaoVien",
     NV = "NhanVien",
@@ -60,7 +59,6 @@ class GiaoVien(db.Model):
     email = Column(String(45))
     ngay_sinh = Column(Date)
     so_dien_thoai = Column(String(10))
-    day = relationship('Day', backref="giao_vien", lazy=True)
     tai_khoan_id = Column(Integer, ForeignKey('tai_khoan.id'), unique=True)
 
     # def __init__(self, id, ho, ten, gioi_tinh, dia_chi, email, ngay_sinh, so_dien_thoai):
@@ -139,7 +137,7 @@ class ThongTinNamHoc(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     nam_hoc = Column(String(20), nullable=False)
     hoc_ki = Column(Integer, nullable=False)
-    day = relationship('Day', lazy=True)
+    day = relationship('Day', backref="thong_tin_nam_hoc", lazy=True)
     hoc_sinh_hoc_mon = relationship('HocSinhHocMon', backref="thong_tin_nam_hoc", lazy=True)
     hoc_sinh_thuoc_lop = relationship('HocSinhThuocLop', backref="thong_tin_nam_hoc", lazy=True)
 
@@ -156,7 +154,7 @@ class PhongHoc(db.Model):
 class Day(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     chu_nhiem = Column(Boolean, nullable=False)
-    giao_vien_id = Column(Integer, ForeignKey('giao_vien.id'))
+    giao_vien_day_mon_id = Column(Integer, ForeignKey('giao_vien_day_mon.id'))
     lop_id = Column(Integer, ForeignKey('lop.id'))
     thong_tin_nam_hoc_id = Column(Integer, ForeignKey('thong_tin_nam_hoc.id'))
     phong_id = Column(Integer, ForeignKey('phong_hoc.id'))
@@ -188,6 +186,8 @@ class GiaoVienDayMon(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     mon_hoc_id = Column(Integer, ForeignKey('mon_hoc.id'), nullable=False)
     giao_vien_id = Column(Integer, ForeignKey('giao_vien.id'), nullable=False)
+    day = relationship('Day', backref="giao_vien_day_mon", lazy=True)
+
 
 class QuyDinh:
     SI_SO = 40
@@ -317,9 +317,9 @@ if __name__ == '__main__':
         )
 
         # Thêm tất cả vào session và commit
-        db.session.add_all([lop1, mon_hoc, hoc_sinh1, hoc_sinh2])
-        db.session.commit()
-        db.session.add_all([taikhoan1, taikhoan2, taikhoan3])
-        db.session.commit()
-        db.session.add_all([hoc_sinh_thuoc_lop1, hoc_sinh_thuoc_lop2, quantri, nv, giaovien ])
+        # db.session.add_all([lop1, mon_hoc, hoc_sinh1, hoc_sinh2])
+        # db.session.commit()
+        # db.session.add_all([taikhoan1, taikhoan2, taikhoan3])
+        # db.session.commit()
+        db.session.add_all([ quantri, nv, giaovien ])
         db.session.commit()

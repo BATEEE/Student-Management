@@ -2,9 +2,10 @@ from fileinput import hook_compressed
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import query_expression
-
+from flask_login import current_user
 from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc, HocSinh, HocSinhThuocLop, Lop, LoaiDiem, Diem, \
-    HocSinhHocMon, ThongTinNamHoc, NamHocHienTai,Day
+HocSinhHocMon, ThongTinNamHoc, NamHocHienTai, NhanVien, Day, GiaoVienDayMon
+
 from init import db
 from sqlalchemy import func, asc
 from datetime import datetime
@@ -150,6 +151,15 @@ def get_listHocSinh_lop(idlop):
               .join(Lop,HocSinhThuocLop.lop_id.__eq__(Lop.id))).filter(Lop.id.__eq__(idlop))
               .join(ThongTinNamHoc,ThongTinNamHoc.id==HocSinhThuocLop.thong_tin_nam_hoc_id).filter(ThongTinNamHoc.nam_hoc.__eq__(2024)).all())
 
+def get_list_class_of_teacher():
+    user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
+    return Day.query.join(Day.thong_tin_nam_hoc) \
+            .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)) \
+            .distinct(Day.lop_id).all()
+
+def get_subject_of_teacher():
+    user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
+    return GiaoVienDayMon.query.filter(GiaoVienDayMon.giao_vien_id.__eq__(user.id)).all()
 #Lay hoc sinh
 def get_hocsinh(idHocSinh):
       return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
