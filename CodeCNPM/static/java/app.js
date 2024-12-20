@@ -410,3 +410,11 @@ function thongke(){
 }
 
 
+// Thông báo thêm học sinh
+function thongBaoThemHocSinh(msg) {
+//    if (msg !== "") {
+//        alert(msg)
+//    }
+    console.log(1)
+}
+

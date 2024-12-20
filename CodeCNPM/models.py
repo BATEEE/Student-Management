@@ -190,6 +190,15 @@ class GiaoVienDayMon(db.Model):
     mon_hoc_id = Column(Integer, ForeignKey('mon_hoc.id'), nullable=False)
     giao_vien_id = Column(Integer, ForeignKey('giao_vien.id'), nullable=False)
 
+class QuyDinh:
+    SI_SO = 40
+    AGE_MAX = 20
+    AGE_MIN = 15
+
+class NamHocHienTai:
+    NAM_HOC = "2024"
+    HOC_KY = 1
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
