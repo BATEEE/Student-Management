@@ -5,7 +5,7 @@ import dao
 from flask_login import login_user, current_user
 from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh
 from models import HocSinh, ThongTinNamHoc, Lop
-from init import app, login
+from init import app, login, db
 from flask_login import login_user, current_user, login_required, logout_user
 from models import HocSinh
 
