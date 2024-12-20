@@ -20,6 +20,11 @@
                 <label for="class">Nhập sĩ số:</label>
                 <input id="number_of_class" type="number" value={{session['number_of_class']}} name="number_of_class" placeholder="" required/>
             </div>
+
+            <div class="content flex">
+                <label for="class">Năm học:</label>
+                <input type="text" name="" value="2024-2025" readonly/>
+            </div>
         </div>
 
         <button type="submit" value="" class="make_profile_student button" onclick="">Tạo danh sách</button>
@@ -28,7 +33,6 @@
     <form action="/nv/create_class" method="post">
         <div class="table">
             <table>
-
                 <thead>
                 <tr>
                     <th>ID</th>

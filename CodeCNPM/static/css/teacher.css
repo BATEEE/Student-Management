@@ -1,0 +1,55 @@
+@import 'config_css/sidebar.css';
+@import 'config_css/header.css';
+@import 'config_css/footer.css';
+@import 'config_css/main-content.css';
+@import 'settings.css';
+
+.main-container .button.left {
+    margin-inline: 1.7rem auto;
+}
+
+.table-container {
+    text-align: center;
+    padding-inline: 1.7rem;
+}
+
+.score-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    table-layout: auto;
+}
+
+.score-table thead th {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+.score-table tbody td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+.score-table tbody tr td:nth-child(2) {
+    text-align: left;
+}
+
+.score-table tbody tr td:nth-child(1) {
+    width: 1%;
+}
+
+.score-table tbody input {
+    width: auto;
+    min-width: 1ch;
+    max-width: 2ch;
+    padding: 3px 6px;
+}
+
+.score-table tbody td.score {
+    width: 80px;
+
+}
+
+

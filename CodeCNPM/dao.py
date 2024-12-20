@@ -21,8 +21,6 @@ def add_user(username, password, role):
     n = TaiKhoan.query.count() # so luong user trong Tai Khoan
 
 
-
-
 # thêm môn học
 def add_subject(id, ten_mon_hoc):
     mon_hoc = MonHoc(id=id, ten_mon_hoc=ten_mon_hoc)

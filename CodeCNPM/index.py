@@ -237,6 +237,30 @@ def get_hocSinhTheoLop():
     return jsonify(listStudent)
 
 
+#Trang Giao Vien
+@app.route('/gv')
+@role_required(['gv'])
+@login_required
+def teacher():
+    return render_template('teacher/teacher.html')
+
+
+@app.route('/gv/nhap_diem')
+@role_required(['gv'])
+@login_required
+def nhap_diem():
+    theme_name = "Nhập điểm"
+    return render_template('teacher/nhapdiem.html', theme_name=theme_name)
+
+
+@app.route('/gv/xuat_diem')
+@role_required(['gv'])
+@login_required
+def xuat_diem():
+    theme_name = "Xuất điểm"
+    return render_template('teacher/xuatdiem.html', theme_name=theme_name)
+
+
 @login.user_loader
 def load_user(user_id):
     return dao.get_user_by_id(user_id)
