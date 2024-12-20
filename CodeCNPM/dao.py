@@ -122,8 +122,14 @@ def get_hocsinh_lop():
             .join(HocSinh,HocSinhThuocLop.hoc_sinh_id==HocSinh.id).group_by(Lop.id,Lop.ten_lop).distinct().all())
 #Lay danh hoc sinh theo lop
 def get_listHocSinh_lop(idlop):
-      return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi).join(HocSinhThuocLop,HocSinhThuocLop.hoc_sinh_id==HocSinh.id)
-              .join(Lop,HocSinhThuocLop.lop_id.__eq__(Lop.id))).filter(Lop.id.__eq__(idlop)).all()
+      return ((db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
+              .join(HocSinhThuocLop,HocSinhThuocLop.hoc_sinh_id==HocSinh.id)
+              .join(Lop,HocSinhThuocLop.lop_id.__eq__(Lop.id))).filter(Lop.id.__eq__(idlop))
+              .join(ThongTinNamHoc,ThongTinNamHoc.id==HocSinhThuocLop.thong_tin_nam_hoc_id).filter(ThongTinNamHoc.nam_hoc.__eq__(2024)).all())
 
+#Lay hoc sinh
+def get_hocsinh(idHocSinh):
+      return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
+              .filter(HocSinh.id.__eq__(idHocSinh)).first())
 
 
