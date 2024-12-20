@@ -234,11 +234,17 @@ function AddStudentFunc() {
     }
 }
 //Điều chỉnh danh lớp
-document.addEventListener('DOMContentLoaded', function() {
+let dem=1
+let selectedStudents = [];
+document.addEventListener('DOMContentLoaded',()=>{
+    if (window.location.pathname === '/nv/adjust_class') {
+
     loadSiSo();
-});
+}
+})
 
 function loadSiSo(){
+    dem=1
     const selectElement=document.getElementById('class')
     const selectedOption = selectElement.options[selectElement.selectedIndex];
     const siSo=selectedOption.getAttribute("data-siso");
@@ -258,7 +264,6 @@ function loadSiSo(){
             {
             const rowStudent=document.getElementById('hocsinh')
             rowStudent.innerHTML=""
-            let dem=1;
             data.forEach(item =>{
 
             const tr = document.createElement('tr');
@@ -294,8 +299,123 @@ function loadSiSo(){
         .catch(error => console.error('Error:', error));
 }
 //
+function updateAdjustTable(){
+            const tr = document.createElement('tr');
+            const tdStt = document.createElement('td');
+            const tdHoTen = document.createElement('td');
+            const tdGioiTinh = document.createElement('td');
+            const tdNgaySinh = document.createElement('td');
+            const tdDiaChi=document.createElement('td')
+
+            tdStt.textContent=dem++
+            tdHoTen.textContent=item.ho+" "+item.ten
+            tdGioiTinh.textContent=item.gioi_tinh ? "Nữ" : "Nam"
+            tdNgaySinh.textContent=item.ngay_sinh
+            tdDiaChi.textContent=item.dia_chi
+
+            tr.appendChild(tdStt)
+            tr.appendChild(tdHoTen)
+            tr.appendChild(tdGioiTinh)
+            tr.appendChild(tdNgaySinh)
+            tr.appendChild(tdDiaChi);
+
+            let tdElement = document.createElement('td');
+            tdElement.classList.add('delete-student');
+            let buttonElement = document.createElement('button');
+            buttonElement.setAttribute('type', 'submit');
+            buttonElement.textContent = 'x';
+            tdElement.appendChild(buttonElement);
+            tr.appendChild(tdElement)
+}
+
+function AddStudentToTable() {
+    var studentId = document.getElementById('student_id').value;
+    var selectElement=document.getElementById('class');
+    var classId = selectElement.options[selectElement.selectedIndex].id;
+    if (studentId && classId) {
+        fetch(`/nv/adjust_class/get_hocSinh?student_id=${studentId}&class_id=${classId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if ((Array.isArray(data) && data.length === 0)) {
+               alert("Lỗi đã có học sinh này trong lớp hoặc nhập sai id!")
+               return
+            }
+            if (selectedStudents.find(student => student.id === data["id"] && student.id_class === classId)) {
+            alert("Học sinh này đã được thêm: " + data["ho_ten"]);
+            return;
+               }
+            const rowStudent=document.getElementById('hocsinh')
+            const tr = document.createElement('tr');
+            const tdStt = document.createElement('td');
+            const tdHoTen = document.createElement('td');
+            const tdGioiTinh = document.createElement('td');
+            const tdNgaySinh = document.createElement('td');
+            const tdDiaChi=document.createElement('td')
+
+            tdStt.textContent=dem++
+            tdHoTen.textContent=data["ho_ten"]
+            tdGioiTinh.textContent=data["gioi_tinh"]
+            tdNgaySinh.textContent=data["ngay_sinh"]
+            tdDiaChi.textContent=data["dia_chi"]
+
+            tr.appendChild(tdStt)
+            tr.appendChild(tdHoTen)
+            tr.appendChild(tdGioiTinh)
+            tr.appendChild(tdNgaySinh)
+            tr.appendChild(tdDiaChi);
+
+            let tdElement = document.createElement('td');
+            tdElement.classList.add('delete-student');
+            let buttonElement = document.createElement('button');
+            buttonElement.setAttribute('type', 'submit');
+            buttonElement.textContent = 'x';
+            tdElement.appendChild(buttonElement);
+            tr.appendChild(tdElement)
+            rowStudent.appendChild(tr)
+            selectedStudents.push({
+            "id":data["id"],
+            "id_class":classId
+            })
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+        });
+    } else {
+        alert('Vui lòng nhập ID học sinh!');
+    }
+}
 
 function AddStudentList() {
+    if (selectedStudents) {
+        fetch(`/nv/adjust_class`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+               students:selectedStudents
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                selectedStudents=[]
+            } else {
+                alert('Lỗi: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+        });
+    } else {
+        alert('Vui lòng nhập ID học sinh!');
+    }
 }
 
 //Nhập input cho điểm
@@ -440,19 +560,12 @@ function thongBaoThemHocSinh(msg) {
 }
 
 function generateTable() {
-    fetch(`/api/gv/nhap_diem`, {
-            method: "post",
-            body: JSON.stringify{
 
-            }
-        }).then(res => res.json()).then(data => {
             phut_15 = document.getElementById('15p').value
             phut_45 = document.getElementById('45p').value
             col_15 = document.getElementById('col_15')
             col_45 = document.getElementById('col_45')
             col_15.setAttribute('colspan', phut_15)
             col_45.setAttribute('colspan', phut_45)
-        }).catch(error => {
-            alert("Có lỗi xảy ra. Vui lòng thử lại.");
-        });
+
 }

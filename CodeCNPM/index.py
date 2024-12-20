@@ -1,6 +1,9 @@
 import datetime
 from flask import request, redirect, render_template, session, abort, jsonify
 from functools import wraps
+
+from sqlalchemy.dialects.mssql.json import JSONIndexType
+
 import dao
 from flask_login import login_user, current_user
 from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NamHocHienTai
@@ -222,6 +225,7 @@ def adjust_class():
     danhsachlop=dao.get_hocsinh_lop()
     return render_template('ems/adjust_class.html', theme_name=theme_name,danhsachlop=danhsachlop)
 
+#Lay danh sach hoc sinh theo lop
 @app.route('/nv/adjust_class/get_listStudent',methods=['GET'])
 def get_hocSinhTheoLop():
     idLop=request.args.get('id_lop')
@@ -236,6 +240,41 @@ def get_hocSinhTheoLop():
     } for student in result]
     return jsonify(listStudent)
 
+#Them hoc sinh moi khi dieu chinh lop
+@app.route('/nv/adjust_class',methods=['POST'])
+@role_required(['nv'])
+@login_required
+def dieuChinhLop_themHocSinh():
+    data=request.get_json()
+    student_obj=data['students']
+    class_id=student_obj[0]['id_class']
+    # list_student_class=dao.get_listHocSinh_lop(class_id)
+    dao.add_student_into_class(list_student=student_obj,class_id=class_id)
+    return jsonify({"success": True, "message": "Học sinh đã được thêm vào lớp"})
+
+@app.route('/nv/adjust_class/get_hocSinh',methods=['GET'])
+@role_required(['nv'])
+@login_required
+def dieuChinhLop_getHocSinh():
+    student_id=request.args.get('student_id')
+    class_id=request.args.get('class_id')
+    list_student_class = dao.get_listHocSinh_lop(class_id)
+    for item in list_student_class:
+        if item[0].__eq__(student_id):
+            return jsonify([])
+    result=dao.get_hocsinh(student_id)
+    if result :
+        sex={True:"Nữ", False: "Nam"} [result[3]]
+        student={
+            "id":result[0],
+            "ho_ten":result[1]+" "+result[2],
+            "gioi_tinh":sex,
+            "ngay_sinh": result[4].strftime("%d-%m-%Y"),
+            "dia_chi": result[5]
+
+        }
+        return jsonify(student)
+    return jsonify([])
 
 #Trang Giao Vien
 @app.route('/gv')

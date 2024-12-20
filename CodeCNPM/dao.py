@@ -80,7 +80,7 @@ def get_all_class(khoi_lop=[10, 11, 12]):
 
 # Them hoc sinh vao lop
 def add_student_into_class(list_student, class_id):
-    thong_tin_nam_hoc = ThongTinNamHoc.query.filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).first()
+    thong_tin_nam_hoc = ThongTinNamHoc.query.filter(ThongTinNamHoc. nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).first()
     for k in list_student:
         hoc_sinh_thuoc_lop = HocSinhThuocLop(hoc_sinh_id=k['id'], lop_id=class_id, thong_tin_nam_hoc_id=thong_tin_nam_hoc.id)
         db.session.add(hoc_sinh_thuoc_lop)
@@ -145,8 +145,10 @@ def get_hocsinh_lop():
             .join(HocSinh,HocSinhThuocLop.hoc_sinh_id==HocSinh.id).group_by(Lop.id,Lop.ten_lop).distinct().all())
 #Lay danh hoc sinh theo lop
 def get_listHocSinh_lop(idlop):
-      return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi).join(HocSinhThuocLop,HocSinhThuocLop.hoc_sinh_id==HocSinh.id)
-              .join(Lop,HocSinhThuocLop.lop_id.__eq__(Lop.id))).filter(Lop.id.__eq__(idlop)).all()
+      return ((db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
+              .join(HocSinhThuocLop,HocSinhThuocLop.hoc_sinh_id==HocSinh.id)
+              .join(Lop,HocSinhThuocLop.lop_id.__eq__(Lop.id))).filter(Lop.id.__eq__(idlop))
+              .join(ThongTinNamHoc,ThongTinNamHoc.id==HocSinhThuocLop.thong_tin_nam_hoc_id).filter(ThongTinNamHoc.nam_hoc.__eq__(2024)).all())
 
 def get_list_class_of_teacher():
     user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
@@ -157,5 +159,9 @@ def get_list_class_of_teacher():
 def get_subject_of_teacher():
     user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
     return GiaoVienDayMon.query.filter(GiaoVienDayMon.giao_vien_id.__eq__(user.id)).all()
+#Lay hoc sinh
+def get_hocsinh(idHocSinh):
+      return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
+              .filter(HocSinh.id.__eq__(idHocSinh)).first())
 
 
