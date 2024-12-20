@@ -1,15 +1,14 @@
+import datetime
 from flask import request, redirect, render_template, session, abort, jsonify
 from functools import wraps
 
 from sqlalchemy.dialects.mssql.json import JSONIndexType
 
 import dao
-
-from init import app, login, db
 from flask_login import login_user, current_user
-from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop
+from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh
 from models import HocSinh, ThongTinNamHoc, Lop
-from init import app, login
+from init import app, login, db
 from flask_login import login_user, current_user, login_required, logout_user
 from models import HocSinh
 
@@ -80,6 +79,7 @@ def employee():
 def add_student_process():
     theme_name = "Thêm học sinh"
     student_id = None
+    msg = ""
     if request.method.__eq__('POST'):
         count = str(HocSinh.query.count() + 1)
         student_id = 'HS' + '0' * (4 - len(count)) + count
@@ -90,13 +90,16 @@ def add_student_process():
         address = request.form.get('address')
         contact = request.form.get('contact')
         email = request.form.get('email')
-
-        dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email,
+        if datetime.datetime.now().year - int(date[:4]) >= 15 and datetime.datetime.now().year - int(date[:4]) <= 20:
+            dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email,
                         ngay_sinh=date, so_dien_thoai=contact)
+            msg = "Thêm thành công"
+        else:
+            msg = "Số tuổi yêu cầu từ 15 đến 20"
 
     count = str(HocSinh.query.count() + 1)
     return render_template("ems/add_student.html", theme_name=theme_name,
-                           count=count, len_of_count=len(count))
+                           count=count, len_of_count=len(count), msg=msg)
 
 
 @app.route('/nv/search')
@@ -105,7 +108,7 @@ def add_student_process():
 def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
-    student = dao.find_student_class(id)
+    student = dao.find_student(id)
     return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 
@@ -116,8 +119,8 @@ def update_student():
     student = None
     id = request.args.get('id')
 
-    if request.method.__eq__('GET'):
-        student = dao.find_student_class(id)
+    if request.method.__eq__('GET') and 'id' in request.args:
+        student = dao.find_student(id)
     elif request.method.__eq__('POST'):
         ho = request.form.get('first_name')
         ten = request.form.get('last_name')
@@ -162,7 +165,7 @@ def make_profile_student():
 @login_required
 def create_class():
     theme_name = "Lập danh sách lớp"
-    list_class = dao.get_all_class([10])
+    list_class = dao.get_all_class()
     number_of_class = session.get('number_of_class')
     if not number_of_class:
         session['number_of_class'] = 0
@@ -172,8 +175,8 @@ def create_class():
     if request.method.__eq__('GET') and 'number_of_class' in request.args:
         session['class_id'] = request.args.get('class_id')
         session['number_of_class'] = request.args.get('number_of_class')
-        if int(session['number_of_class']) > 40:
-            session['number_of_class'] = 40
+        if int(session['number_of_class']) > QuyDinh.SI_SO:
+            session['number_of_class'] = QuyDinh.SI_SO
         elif int(session['number_of_class']) <= 0:
             session['number_of_class'] = 1
         list_student = dao.create_class(class_id=session['class_id'], number_of_class=session['number_of_class'])
@@ -272,6 +275,30 @@ def dieuChinhLop_getHocSinh():
         }
         return jsonify(student)
     return jsonify([])
+
+#Trang Giao Vien
+@app.route('/gv')
+@role_required(['gv'])
+@login_required
+def teacher():
+    return render_template('teacher/teacher.html')
+
+
+@app.route('/gv/nhap_diem')
+@role_required(['gv'])
+@login_required
+def nhap_diem():
+    theme_name = "Nhập điểm"
+    return render_template('teacher/nhapdiem.html', theme_name=theme_name)
+
+
+@app.route('/gv/xuat_diem')
+@role_required(['gv'])
+@login_required
+def xuat_diem():
+    theme_name = "Xuất điểm"
+    return render_template('teacher/xuatdiem.html', theme_name=theme_name)
+
 
 @login.user_loader
 def load_user(user_id):

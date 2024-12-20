@@ -418,6 +418,27 @@ function AddStudentList() {
     }
 }
 
+//Nhập input cho điểm
+function limitInput() {
+  var inputs = document.querySelectorAll('.scoreInput');
+
+  // Duyệt qua từng input
+  inputs.forEach(function(input) {
+    var value = input.value;
+
+    // Kiểm tra xem giá trị có phải là số và có tối đa 2 chữ số
+    if (/^\d{1,2}$/.test(value)) {
+      // Cắt nếu giá trị vượt quá 10
+      if (value > 10) {
+        input.value = "10";
+      }
+    } else {
+      // Nếu không phải là số hợp lệ, chỉ giữ lại phần số
+      input.value = value.replace(/[^0-9]/g, '').slice(0, 2);
+    }
+  });
+}
+
 // Thống kê
 let char=null
 
@@ -530,3 +551,10 @@ function thongke(){
 }
 
 
+// Thông báo thêm học sinh
+function thongBaoThemHocSinh(msg) {
+//    if (msg !== "") {
+//        alert(msg)
+//    }
+    console.log(1)
+}

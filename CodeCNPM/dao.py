@@ -4,8 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import query_expression
 
 from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc, HocSinh, HocSinhThuocLop, Lop, LoaiDiem, Diem, \
-    HocSinhHocMon, ThongTinNamHoc
-from init import db, NAMHOC, HOCKY
+    HocSinhHocMon, ThongTinNamHoc, NamHocHienTai
+from init import db
 from sqlalchemy import func, asc
 from datetime import datetime
 import hashlib
@@ -19,8 +19,6 @@ def auth_login(username, password):
 def add_user(username, password, role):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
     n = TaiKhoan.query.count() # so luong user trong Tai Khoan
-
-
 
 
 # thêm môn học
@@ -48,8 +46,33 @@ def find_student_class(id):
     return student_class
 
 def find_student(id):
+    if not id:
+        return []
     student = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
-    return student
+    student_class = find_student_class(student.id)
+    if student_class:
+        return {
+            "id": student_class.hoc_sinh.id,
+            "ho": student_class.hoc_sinh.ho,
+            "ten": student_class.hoc_sinh.ten,
+            "dia_chi": student_class.hoc_sinh.dia_chi,
+            "ngay_sinh": student_class.hoc_sinh.ngay_sinh,
+            "gioi_tinh": student_class.hoc_sinh.gioi_tinh,
+            "ten_lop": student_class.lop.ten_lop,
+            "so_dien_thoai": student_class.hoc_sinh.so_dien_thoai,
+            "email": student_class.hoc_sinh.email,
+        }
+    return {
+            "id": student.id,
+            "ho": student.ho,
+            "ten": student.ten,
+            "dia_chi": student.dia_chi,
+            "ngay_sinh": student.ngay_sinh,
+            "gioi_tinh": student.gioi_tinh,
+            "ten_lop": "Không có lớp",
+            "so_dien_thoai": student.so_dien_thoai,
+            "email": student.email,
+        }
 
 # Lay danh sach lop hoc
 def get_all_class(khoi_lop=[10, 11, 12]):
@@ -57,7 +80,7 @@ def get_all_class(khoi_lop=[10, 11, 12]):
 
 # Them hoc sinh vao lop
 def add_student_into_class(list_student, class_id):
-    thong_tin_nam_hoc = ThongTinNamHoc.query.filter(ThongTinNamHoc. nam_hoc.__eq__(NAMHOC), ThongTinNamHoc.hoc_ki.__eq__(HOCKY)).first()
+    thong_tin_nam_hoc = ThongTinNamHoc.query.filter(ThongTinNamHoc. nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).first()
     for k in list_student:
         hoc_sinh_thuoc_lop = HocSinhThuocLop(hoc_sinh_id=k['id'], lop_id=class_id, thong_tin_nam_hoc_id=thong_tin_nam_hoc.id)
         db.session.add(hoc_sinh_thuoc_lop)

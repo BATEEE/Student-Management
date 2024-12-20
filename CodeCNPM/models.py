@@ -190,44 +190,37 @@ class GiaoVienDayMon(db.Model):
     mon_hoc_id = Column(Integer, ForeignKey('mon_hoc.id'), nullable=False)
     giao_vien_id = Column(Integer, ForeignKey('giao_vien.id'), nullable=False)
 
+class QuyDinh:
+    SI_SO = 40
+    AGE_MAX = 20
+    AGE_MIN = 15
+
+class NamHocHienTai:
+    NAM_HOC = "2024"
+    HOC_KY = 1
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        # taikhoan1 = TaiKhoan(ten_tai_khoan="Trần Tuấn Thắng", tai_khoan="admin1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
-        #                     ngay_tao="2004-2-12", email="thangancut@gmail.com", user_role=UserRole.QT)
-        # taikhoan2 = TaiKhoan(ten_tai_khoan="Nguyễn Hoàng Phúc", tai_khoan="nhanvien1", mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
-        #                      ngay_tao="2004-12-15", email="phuc@gmail.com", user_role=UserRole.NV)
-        # quantri = QuanTri(ho="Trần Tuấn", ten='Thắng', gioi_tinh=0, dia_chi="189/34/28A Bach Dang Phuong 3 Go Vap",
-        #                   email="thangdaubuoi@gmail.com", ngay_sinh="2004-3-20", so_dien_thoai="01242542", tai_khoan_id=taikhoan1.id)
-        # mon_hoc = MonHoc(ten_mon_hoc="Lập trình Python")
-        # db.session.add_all([taikhoan1, quantri])
-        # db.session.add(mon_hoc)
-        # nv = NhanVien(ho='Nguyễn Hoàng', ten='Phúc', gioi_tinh=0, dia_chi='189/34/28A Bach Dang Phuong 3 Go Vap',
-        #               email="phuc@gmail.com", ngay_sinh="2004-12-31", so_dien_thoai="01242542", tai_khoan_id=taikhoan2.id)
-        # db.session.add_all([taikhoan2, nv])
-        #  # db.session.add(taikhoan)
-        # db.session.commit()
-        # Tạo dữ liệu mẫu cho các bảng
-
         # Tạo tài khoản Quản trị viên
-        # taikhoan1 = TaiKhoan(
-        #     ten_tai_khoan="Trần Tuấn Thắng",
-        #     tai_khoan="admin1",
-        #     mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
-        #     ngay_tao="2004-2-12",
-        #     email="thangancut@gmail.com",
-        #     user_role=UserRole.QT
-        # )
-        #
-        # # Tạo tài khoản Nhân viên
-        # taikhoan2 = TaiKhoan(
-        #     ten_tai_khoan="Nguyễn Hoàng Phúc",
-        #     tai_khoan="nhanvien1",
-        #     mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
-        #     ngay_tao="2004-12-15",
-        #     email="phuc@gmail.com",
-        #     user_role=UserRole.NV
-        # )
+        taikhoan1 = TaiKhoan(
+            ten_tai_khoan="Trần Tuấn Thắng",
+            tai_khoan="admin1",
+            mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
+            ngay_tao="2004-2-12",
+            email="thangancut@gmail.com",
+            user_role=UserRole.QT
+        )
+
+        # Tạo tài khoản Nhân viên
+        taikhoan2 = TaiKhoan(
+            ten_tai_khoan="Nguyễn Hoàng Phúc",
+            tai_khoan="nhanvien1",
+            mat_khau=str(hashlib.md5("123456".strip().encode('utf-8')).hexdigest()),
+            ngay_tao="2004-12-15",
+            email="phuc@gmail.com",
+            user_role=UserRole.NV
+        )
 
         # Tạo tài khoản Giáo viên
         taikhoan3 = TaiKhoan(
@@ -240,28 +233,28 @@ if __name__ == '__main__':
         )
 
         # Tạo Quản trị viên
-        # quantri = QuanTri(
-        #     ho="Trần Tuấn",
-        #     ten='Thắng',
-        #     gioi_tinh=0,
-        #     dia_chi="189/34/28A Bach Dang Phuong 3 Go Vap",
-        #     email="thangdaubuoi@gmail.com",
-        #     ngay_sinh="2004-3-20",
-        #     so_dien_thoai="01242542",
-        #     tai_khoan_id=taikhoan1.id
-        # )
-        #
-        # # Tạo Nhân viên
-        # nv = NhanVien(
-        #     ho='Nguyễn Hoàng',
-        #     ten='Phúc',
-        #     gioi_tinh=0,
-        #     dia_chi='189/34/28A Bach Dang Phuong 3 Go Vap',
-        #     email="phuc@gmail.com",
-        #     ngay_sinh="2004-12-31",
-        #     so_dien_thoai="01242542",
-        #     tai_khoan_id=taikhoan2.id
-        # )
+        quantri = QuanTri(
+            ho="Trần Tuấn",
+            ten='Thắng',
+            gioi_tinh=0,
+            dia_chi="189/34/28A Bach Dang Phuong 3 Go Vap",
+            email="thangdaubuoi@gmail.com",
+            ngay_sinh="2004-3-20",
+            so_dien_thoai="01242542",
+            tai_khoan_id=taikhoan1.id
+        )
+
+        # Tạo Nhân viên
+        nv = NhanVien(
+            ho='Nguyễn Hoàng',
+            ten='Phúc',
+            gioi_tinh=0,
+            dia_chi='189/34/28A Bach Dang Phuong 3 Go Vap',
+            email="phuc@gmail.com",
+            ngay_sinh="2004-12-31",
+            so_dien_thoai="01242542",
+            tai_khoan_id=taikhoan2.id
+        )
 
         # Tạo Giáo viên
         giaovien = GiaoVien(
@@ -313,7 +306,7 @@ if __name__ == '__main__':
 
         # Tạo Mối quan hệ Học sinh thuộc lớp
         hoc_sinh_thuoc_lop1 = HocSinhThuocLop(
-            hoc_sinh_id="HS0001",
+            hoc_sinh_id=hoc_sinh1.id,
             lop_id=lop1.id,
             thong_tin_nam_hoc_id=1
         )
@@ -325,6 +318,9 @@ if __name__ == '__main__':
         )
 
         # Thêm tất cả vào session và commit
-        db.session.add_all([hoc_sinh_thuoc_lop1, hoc_sinh_thuoc_lop2])
+        db.session.add_all([lop1, mon_hoc, hoc_sinh1, hoc_sinh2])
         db.session.commit()
-
+        db.session.add_all([taikhoan1, taikhoan2, taikhoan3])
+        db.session.commit()
+        db.session.add_all([hoc_sinh_thuoc_lop1, hoc_sinh_thuoc_lop2, quantri, nv, giaovien ])
+        db.session.commit()
