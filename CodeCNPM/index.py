@@ -216,6 +216,14 @@ def delete_student(hoc_sinh_id):
             return jsonify({"success": True, "message": "Học sinh đã được xóa"})
     return jsonify({"success": False, "message": "Học sinh không tồn tại"})
 
+#Xoa hoc sinh khoi lop
+@app.route("/api/adjust_class/<hoc_sinh_id>&<class_id>", methods=['delete'])
+def delete_student_class(hoc_sinh_id,class_id):
+    if dao.delete_hocsinh(idHocSinh=hoc_sinh_id,idLop=class_id):
+         db.session.commit()
+         return jsonify({"success":True, "message": "Xóa học sinh thành công!"})
+    return jsonify({"success": False, "message": "Xóa học sinh không thành công!"})
+
 #Dieu chinh lop
 @app.route('/nv/adjust_class')
 @role_required(['nv'])

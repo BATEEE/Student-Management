@@ -14,7 +14,6 @@ class UserRole(EnumRole):
     NV = "NhanVien",
     QT = "QuanTri"
 
-
 # 'giao_vien.Id', 'quan_tri.Id', 'nhan_vien.Id'
 
 class TaiKhoan(db.Model, UserMixin):

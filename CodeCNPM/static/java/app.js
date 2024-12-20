@@ -243,6 +243,23 @@ document.addEventListener('DOMContentLoaded',()=>{
 }
 })
 
+//Xóa học sinh khỏi lớp UI
+function delete_hocSinhUI(id,class_id){
+     if(selectedStudents.find(student => student.id === id && student.id_class === class_id))
+        selectedStudents=selectedStudents.filter(student=> student.id!==id && student.id_class!==class_id)
+     if (confirm("Bạn chắc chắn xóa không?") === true) {
+        fetch(`/api/adjust_class/${id}&${class_id}`, {
+            method: "delete"
+        }).then(res => res.json()).then(data => {
+            alert(data.message)
+            document.getElementById(`studentId${id}`).style.display = "none";
+        }).catch(error => {
+            alert("Có lỗi xảy ra. Vui lòng thử lại.");
+        });
+    }
+}
+
+
 function loadSiSo(){
     dem=1
     const selectElement=document.getElementById('class')
@@ -267,6 +284,7 @@ function loadSiSo(){
             data.forEach(item =>{
 
             const tr = document.createElement('tr');
+            tr.setAttribute('id','studentId'+item.id)
             const tdStt = document.createElement('td');
             const tdHoTen = document.createElement('td');
             const tdGioiTinh = document.createElement('td');
@@ -287,9 +305,16 @@ function loadSiSo(){
 
             let tdElement = document.createElement('td');
             tdElement.classList.add('delete-student');
+            tdElement.setAttribute('id',item.id)
             let buttonElement = document.createElement('button');
             buttonElement.setAttribute('type', 'submit');
             buttonElement.textContent = 'x';
+
+            buttonElement.setAttribute('id',item.id)
+            buttonElement.addEventListener('click',function (){
+            delete_hocSinhUI(item.id,idLop)
+            })
+
             tdElement.appendChild(buttonElement);
             tr.appendChild(tdElement)
             rowStudent.appendChild(tr)
@@ -312,13 +337,11 @@ function updateAdjustTable(){
             tdGioiTinh.textContent=item.gioi_tinh ? "Nữ" : "Nam"
             tdNgaySinh.textContent=item.ngay_sinh
             tdDiaChi.textContent=item.dia_chi
-
             tr.appendChild(tdStt)
             tr.appendChild(tdHoTen)
             tr.appendChild(tdGioiTinh)
             tr.appendChild(tdNgaySinh)
             tr.appendChild(tdDiaChi);
-
             let tdElement = document.createElement('td');
             tdElement.classList.add('delete-student');
             let buttonElement = document.createElement('button');
@@ -351,6 +374,7 @@ function AddStudentToTable() {
                }
             const rowStudent=document.getElementById('hocsinh')
             const tr = document.createElement('tr');
+            tr.setAttribute('id','studentId'+data["id"])
             const tdStt = document.createElement('td');
             const tdHoTen = document.createElement('td');
             const tdGioiTinh = document.createElement('td');
@@ -374,6 +398,14 @@ function AddStudentToTable() {
             let buttonElement = document.createElement('button');
             buttonElement.setAttribute('type', 'submit');
             buttonElement.textContent = 'x';
+
+            //gan id va bat su kien click
+            buttonElement.setAttribute('id',data["id"])
+            buttonElement.addEventListener('click',function (){
+            console.log(data["id"])
+            delete_hocSinhUI(data["id"],classId)
+            })
+
             tdElement.appendChild(buttonElement);
             tr.appendChild(tdElement)
             rowStudent.appendChild(tr)
@@ -391,7 +423,7 @@ function AddStudentToTable() {
 }
 
 function AddStudentList() {
-    if (selectedStudents) {
+    if (Array.isArray(selectedStudents) && selectedStudents.length !== 0) {
         fetch(`/nv/adjust_class`, {
             method: 'POST',
             headers: {
@@ -414,9 +446,10 @@ function AddStudentList() {
             console.error('Lỗi:', error);
         });
     } else {
-        alert('Vui lòng nhập ID học sinh!');
+        alert('Vui lòng thực hiện thay đổi!');
     }
 }
+
 
 //Nhập input cho điểm
 function limitInput() {

@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import query_expression
 
 from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc, HocSinh, HocSinhThuocLop, Lop, LoaiDiem, Diem, \
-    HocSinhHocMon, ThongTinNamHoc, NamHocHienTai
+    HocSinhHocMon, ThongTinNamHoc, NamHocHienTai,Day
 from init import db
 from sqlalchemy import func, asc
 from datetime import datetime
@@ -155,4 +155,13 @@ def get_hocsinh(idHocSinh):
       return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
               .filter(HocSinh.id.__eq__(idHocSinh)).first())
 
+#Xoa hoc sinh
+def delete_hocsinh(idHocSinh,idLop):
+    return HocSinhThuocLop.query.filter(HocSinhThuocLop.lop_id==idLop,HocSinhThuocLop.hoc_sinh_id==idHocSinh).delete()
 
+# def get_giaoVienDayLop():
+#     return (db.session.query(Day.giao_vien_id)
+#             .join(HocSinh,HocSinh.id==HocSinhHocMon.hoc_sinh_id)
+#             .join(Diem,Diem.hoc_sinh_hoc_mon_id==Diem.id)
+#             .join(LoaiDiem,LoaiDiem.id==Diem.loai_diem_id)
+#             .join(Lop,Lop)
