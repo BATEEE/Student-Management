@@ -2,21 +2,23 @@
 
 {% block content %}
 <div class="main-container">
-    <form action="/nv/add" method="post">
+    <form>
         <div class="thems-text">Nhập thông tin</div>
         <div class="content-block flex">
             <div class="content flex">
                 <label>Chọn lớp:</label>
                 <select name="class" id="class">
-                    <option name="" value="">10A1</option>
-                    <option name="" value="">10A2</option>
+                    {% for class in list_class %}
+                    <option name="" value="">{{class.lop.ten_lop}}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="content flex">
                 <label for="subject">Chọn môn học:</label>
                 <select name="subject" id="subject">
-                    <option name="" value="">Toán</option>
-                    <option name="" value="">Ngữ Văn</option>
+                    {% for subject in list_subject %}
+                    <option name="" value="">{{subject.mon_hoc.ten_mon_hoc}}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
@@ -24,16 +26,14 @@
         <div class="content-block flex">
             <div class="content flex">
                 <label for="semester">Chọn học kì:</label>
-                <select name="semester" id="semester">
-                    <option name="" value="">1</option>
-                    <option name="" value="">2</option>
+                <select name="semester" id="semester" disabled>
+                    <option name="" value="">{{hoc_ki}}</option>
                 </select>
             </div>
             <div class="content flex">
                 <label for="semester">Chọn năm học:</label>
-                <select name="year" id="year">
-                    <option name="" value="">2024</option>
-                    <option name="" value="">2025</option>
+                <select name="year" id="year" disabled>
+                    <option name="" value="">{{nam_hoc}}</option>
                 </select>
             </div>
         </div>
@@ -42,15 +42,15 @@
         <div class="content-block flex">
             <div class="content flex">
                 <label for="semester">Số cột 15 phút:</label>
-                <input type="number" name="" max="5" placeholder="" required/>
+                <input type="number" id="15p" name="number_of_15p" value=1 max="5" placeholder="" required/>
             </div>
             <div class="content flex">
                 <label for="semester">Số cột 45 phút:</label>
-                <input type="number" name="" max="3" placeholder="" required/>
+                <input type="number" id="45p" name="number_of_45p" value=1 max="3" placeholder="" required/>
             </div>
         </div>
 
-        <button type="submit" class="button left">Nhập điểm</button>
+        <button type="button" class="button left" onclick="generateTable()">Nhập điểm</button>
     </form>
 
     <form method="post">
@@ -61,8 +61,8 @@
                 <th>STT</th>
                 <th>Họ tên</th>
 <!--                set colspan = số cột-->
-                <th colspan="4">Điểm 15’</th>
-                <th colspan="1">Điểm 1 tiết</th>
+                <th id="col_15" >Điểm 15’</th>
+                <th id="col_45">Điểm 1 tiết</th>
                 <th>Điểm thi</th>
             </tr>
             </thead>

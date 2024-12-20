@@ -1,7 +1,3 @@
-from importlib.metadata import requires
-
-from wtforms.fields.simple import PasswordField
-
 from dao import get_monhoc, get_hocki, get_namhoc, thongke_DatMon
 from init import app,db
 from flask_admin import Admin,AdminIndexView

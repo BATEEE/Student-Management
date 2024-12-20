@@ -3,7 +3,7 @@ from flask import request, redirect, render_template, session, abort, jsonify
 from functools import wraps
 import dao
 from flask_login import login_user, current_user
-from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh
+from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NamHocHienTai
 from models import HocSinh, ThongTinNamHoc, Lop
 from init import app, login, db
 from flask_login import login_user, current_user, login_required, logout_user
@@ -250,8 +250,14 @@ def teacher():
 @login_required
 def nhap_diem():
     theme_name = "Nhập điểm"
-    return render_template('teacher/nhapdiem.html', theme_name=theme_name)
+    list_class = dao.get_list_class_of_teacher()
+    list_subject = dao.get_subject_of_teacher()
+    return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class, list_subject=list_subject
+                           , hoc_ki=NamHocHienTai.HOC_KY, nam_hoc=NamHocHienTai.NAM_HOC)
 
+@app.route('/api/gv/nhap_diem')
+def get_list_student():
+    pass
 
 @app.route('/gv/xuat_diem')
 @role_required(['gv'])
