@@ -268,6 +268,9 @@ def dieuChinhLop_getHocSinh():
     student_id=request.args.get('student_id')
     class_id=request.args.get('class_id')
     list_student_class = dao.get_listHocSinh_lop(class_id)
+    kiemtrahocsinhcolop=dao.kiemtra_hocsinh_lop(student_id)
+    if kiemtrahocsinhcolop:
+        return jsonify([])
     for item in list_student_class:
         if item[0].__eq__(student_id):
             return jsonify([])
@@ -299,7 +302,7 @@ def teacher():
 def nhap_diem():
     theme_name = "Nhập điểm"
     list_class = dao.get_list_class_of_teacher()
-    list_subject = dao.get_subject_of_teacher()
+    list_subject = dao.get_subject_of_teacher_in_class(5)
     return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class, list_subject=list_subject
                            , hoc_ki=NamHocHienTai.HOC_KY, nam_hoc=NamHocHienTai.NAM_HOC)
 
@@ -312,7 +315,8 @@ def get_list_student():
 @login_required
 def xuat_diem():
     theme_name = "Xuất điểm"
-    return render_template('teacher/xuatdiem.html', theme_name=theme_name)
+    list_class = dao.get_list_class_of_teacher()
+    return render_template('teacher/xuatdiem.html', theme_name=theme_name,list_class=list_class)
 
 
 @login.user_loader

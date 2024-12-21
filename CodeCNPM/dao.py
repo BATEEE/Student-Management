@@ -50,8 +50,6 @@ def find_student(id):
     if not id:
         return []
     student = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
-    if not student :
-        return student
     student_class = find_student_class(student.id)
     if student_class:
         return {
@@ -160,9 +158,20 @@ def get_list_class_of_teacher():
                 ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY), GiaoVienDayMon.giao_vien_id.__eq__(user.id)) \
         .distinct(Day.lop_id).all()
 
-def get_subject_of_teacher():
+def get_subject_of_teacher_in_class(class_id):
     user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
-    return GiaoVienDayMon.query.filter(GiaoVienDayMon.giao_vien_id.__eq__(user.id)).all()
+    list_subject = Day.query.join(Day.thong_tin_nam_hoc).join(GiaoVienDayMon.id) \
+        .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC),
+                ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY), Day.lop_id.__eq__(class_id))
+    return list_subject
+
+# Kiem tra hoc sinh da co lop
+def kiemtra_hocsinh_lop(id):
+    return ((db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
+              .join(HocSinhThuocLop,HocSinhThuocLop.hoc_sinh_id.__eq__(HocSinh.id))
+              .join(ThongTinNamHoc,ThongTinNamHoc.id==HocSinhThuocLop.thong_tin_nam_hoc_id)
+              .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC),HocSinh.id.__eq__(id)))).all()
+
 #Lay hoc sinh
 def get_hocsinh(idHocSinh):
       return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)

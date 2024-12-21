@@ -272,6 +272,10 @@ function delete_hocSinhUI(id,class_id){
 function loadSiSo(){
     dem=0
     const selectElement=document.getElementById('class')
+   if(selectElement.selectedIndex===-1)
+   {
+   return;
+   }
     const selectedOption = selectElement.options[selectElement.selectedIndex];
     const siSo=selectedOption.getAttribute("data-siso");
     const updateSiSo=document.getElementById('siso')
@@ -363,6 +367,8 @@ function updateAdjustTable(){
 function AddStudentToTable() {
     var studentId = document.getElementById('student_id').value;
     var selectElement=document.getElementById('class');
+    if(selectElement.selectedIndex===-1)
+    return
     var classId = selectElement.options[selectElement.selectedIndex].id;
     if (studentId && classId) {
         fetch(`/nv/adjust_class/get_hocSinh?student_id=${studentId}&class_id=${classId}`, {
@@ -411,7 +417,6 @@ function AddStudentToTable() {
             //gan id va bat su kien click
             buttonElement.setAttribute('id',data["id"])
             buttonElement.addEventListener('click',function (){
-            console.log(data["id"])
             delete_hocSinhUI(data["id"],classId)
             })
 
@@ -428,7 +433,6 @@ function AddStudentToTable() {
             const updateSiSo=document.getElementById('siso')
             const siSo=parseInt(updateSiSo.value)+1;
             updateSiSo.value=siSo
-            console.log(selectedStudents)
         })
         .catch(error => {
             console.error('Lỗi:', error);
@@ -614,11 +618,11 @@ function thongBaoThemHocSinh(msg) {
 
 function generateTable() {
 
-            phut_15 = document.getElementById('15p').value
-            phut_45 = document.getElementById('45p').value
-            col_15 = document.getElementById('col_15')
-            col_45 = document.getElementById('col_45')
-            col_15.setAttribute('colspan', phut_15)
-            col_45.setAttribute('colspan', phut_45)
+                phut_15 = document.getElementById('15p').value
+                phut_45 = document.getElementById('45p').value
+                col_15 = document.getElementById('col_15')
+                col_45 = document.getElementById('col_45')
+                col_15.setAttribute('colspan', phut_15)
+                col_45.setAttribute('colspan', phut_45)
 
 }
