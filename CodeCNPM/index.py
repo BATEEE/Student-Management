@@ -160,6 +160,7 @@ def make_profile_student():
                            count=count, len_of_count=len(count))
 
 
+
 @app.route('/nv/create_class', methods=['get', 'post'])
 @role_required(['nv'])
 @login_required
