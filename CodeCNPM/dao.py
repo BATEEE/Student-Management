@@ -153,13 +153,19 @@ def get_listHocSinh_lop(idlop):
 
 def get_list_class_of_teacher():
     user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
-    return Day.query.join(Day.thong_tin_nam_hoc) \
-            .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)) \
+    return Day.query.join(Day.thong_tin_nam_hoc).join(Day.giao_vien_day_mon) \
+            .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY), GiaoVienDayMon.giao_vien_id.__eq__(user.id)) \
             .distinct(Day.lop_id).all()
 
-def get_subject_of_teacher():
+def get_subject_of_teacher_in_class(class_id):
     user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
-    return GiaoVienDayMon.query.filter(GiaoVienDayMon.giao_vien_id.__eq__(user.id)).all()
+    list_subject = Day.query.join(Day.thong_tin_nam_hoc).join(GiaoVienDayMon.id) \
+        .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC),
+                ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY), Day.lop_id.__eq__(class_id))
+    return list_subject
+
+
+
 #Lay hoc sinh
 def get_hocsinh(idHocSinh):
       return (db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)

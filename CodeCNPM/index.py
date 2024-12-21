@@ -298,7 +298,7 @@ def teacher():
 def nhap_diem():
     theme_name = "Nhập điểm"
     list_class = dao.get_list_class_of_teacher()
-    list_subject = dao.get_subject_of_teacher()
+    list_subject = dao.get_subject_of_teacher_in_class(21)
     return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class, list_subject=list_subject
                            , hoc_ki=NamHocHienTai.HOC_KY, nam_hoc=NamHocHienTai.NAM_HOC)
 
