@@ -1,5 +1,4 @@
 let currentchar=null
-
 const toggleButton = document.getElementById('toggle-btn')
 const sidebar = document.getElementById('sidebar')
 function toggleSidebar() {
@@ -234,7 +233,7 @@ function AddStudentFunc() {
     }
 }
 //Điều chỉnh danh lớp
-let dem=1
+let dem=0
 let selectedStudents = [];
 document.addEventListener('DOMContentLoaded',()=>{
     if (window.location.pathname === '/nv/adjust_class') {
@@ -245,6 +244,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 //Xóa học sinh khỏi lớp UI
 function delete_hocSinhUI(id,class_id){
+
      if(selectedStudents.find(student => student.id === id && student.id_class === class_id))
         selectedStudents=selectedStudents.filter(student=> student.id!==id && student.id_class!==class_id)
      if (confirm("Bạn chắc chắn xóa không?") === true) {
@@ -252,7 +252,16 @@ function delete_hocSinhUI(id,class_id){
             method: "delete"
         }).then(res => res.json()).then(data => {
             alert(data.message)
-            document.getElementById(`studentId${id}`).style.display = "none";
+            document.getElementById(`studentId${id}`).remove();
+            const selectElement=document.getElementById('class')
+
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const updateSiSo=document.getElementById('siso')
+            const siSo=parseInt(updateSiSo.value)-1;
+            updateSiSo.value=siSo
+            selectedOption.setAttribute("data-siso",siSo)
+            dem--
+            loadSiSo()
         }).catch(error => {
             alert("Có lỗi xảy ra. Vui lòng thử lại.");
         });
@@ -261,14 +270,18 @@ function delete_hocSinhUI(id,class_id){
 
 
 function loadSiSo(){
-    dem=1
+    dem=0
     const selectElement=document.getElementById('class')
+   if(selectElement.selectedIndex===-1)
+   {
+   return;
+   }
     const selectedOption = selectElement.options[selectElement.selectedIndex];
     const siSo=selectedOption.getAttribute("data-siso");
     const updateSiSo=document.getElementById('siso')
     updateSiSo.value=siSo
     const idLop = selectElement.options[selectElement.selectedIndex].id;
-
+    selectedStudents=[]
     fetch(`/nv/adjust_class/get_listStudent?id_lop=${idLop}`,{
     method: 'GET',
         headers: {
@@ -291,7 +304,7 @@ function loadSiSo(){
             const tdNgaySinh = document.createElement('td');
             const tdDiaChi=document.createElement('td')
 
-            tdStt.textContent=dem++
+            tdStt.textContent=++dem
             tdHoTen.textContent=item.ho+" "+item.ten
             tdGioiTinh.textContent=item.gioi_tinh ? "Nữ" : "Nam"
             tdNgaySinh.textContent=item.ngay_sinh
@@ -332,7 +345,7 @@ function updateAdjustTable(){
             const tdNgaySinh = document.createElement('td');
             const tdDiaChi=document.createElement('td')
 
-            tdStt.textContent=dem++
+            tdStt.textContent=++dem
             tdHoTen.textContent=item.ho+" "+item.ten
             tdGioiTinh.textContent=item.gioi_tinh ? "Nữ" : "Nam"
             tdNgaySinh.textContent=item.ngay_sinh
@@ -354,6 +367,8 @@ function updateAdjustTable(){
 function AddStudentToTable() {
     var studentId = document.getElementById('student_id').value;
     var selectElement=document.getElementById('class');
+    if(selectElement.selectedIndex===-1)
+    return
     var classId = selectElement.options[selectElement.selectedIndex].id;
     if (studentId && classId) {
         fetch(`/nv/adjust_class/get_hocSinh?student_id=${studentId}&class_id=${classId}`, {
@@ -381,7 +396,7 @@ function AddStudentToTable() {
             const tdNgaySinh = document.createElement('td');
             const tdDiaChi=document.createElement('td')
 
-            tdStt.textContent=dem++
+            tdStt.textContent=++dem
             tdHoTen.textContent=data["ho_ten"]
             tdGioiTinh.textContent=data["gioi_tinh"]
             tdNgaySinh.textContent=data["ngay_sinh"]
@@ -402,7 +417,6 @@ function AddStudentToTable() {
             //gan id va bat su kien click
             buttonElement.setAttribute('id',data["id"])
             buttonElement.addEventListener('click',function (){
-            console.log(data["id"])
             delete_hocSinhUI(data["id"],classId)
             })
 
@@ -413,6 +427,12 @@ function AddStudentToTable() {
             "id":data["id"],
             "id_class":classId
             })
+
+            const selectElement=document.getElementById('class')
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const updateSiSo=document.getElementById('siso')
+            const siSo=parseInt(updateSiSo.value)+1;
+            updateSiSo.value=siSo
         })
         .catch(error => {
             console.error('Lỗi:', error);
@@ -438,6 +458,10 @@ function AddStudentList() {
             if (data.success) {
                 alert(data.message);
                 selectedStudents=[]
+                const selectElement=document.getElementById('class')
+                const selectedOption = selectElement.options[selectElement.selectedIndex];
+                const siSo=document.getElementById("siso")
+                selectedOption.setAttribute("data-siso",parseInt(siSo.value))
             } else {
                 alert('Lỗi: ' + data.message);
             }

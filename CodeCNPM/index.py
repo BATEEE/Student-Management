@@ -268,6 +268,9 @@ def dieuChinhLop_getHocSinh():
     student_id=request.args.get('student_id')
     class_id=request.args.get('class_id')
     list_student_class = dao.get_listHocSinh_lop(class_id)
+    kiemtrahocsinhcolop=dao.kiemtra_hocsinh_lop(student_id)
+    if kiemtrahocsinhcolop:
+        return jsonify([])
     for item in list_student_class:
         if item[0].__eq__(student_id):
             return jsonify([])

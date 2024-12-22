@@ -4,7 +4,7 @@ from wtforms.fields.simple import PasswordField,StringField
 from dao import get_monhoc, get_hocki, get_namhoc, thongke_DatMon
 from init import app,db
 from flask_admin import Admin,AdminIndexView
-from models import MonHoc, TaiKhoan, HocSinh
+from models import MonHoc, TaiKhoan, HocSinh, GiaoVien, GiaoVienDayMon
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, logout_user
 from flask_admin import BaseView, expose
@@ -62,19 +62,19 @@ class UserModelView(AuthenticatedView):
     can_create = True
     can_edit = True
     column_display_pk = True
-    column_list =            ('id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role')
-    column_searchable_list = ['id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
-    column_filters =         ['id','ten_tai_khoan', 'mat_khau','ngay_tao','email','user_role']
+    column_list =            ('id','ten_tai_khoan','tai_khoan', 'mat_khau','ngay_tao','email','user_role')
+    column_searchable_list = ['id','ten_tai_khoan','tai_khoan' ,'mat_khau','ngay_tao','email','user_role']
+    column_filters =         ['id','ten_tai_khoan','tai_khoan', 'mat_khau','ngay_tao','email','user_role']
     can_view_details = True
     column_labels = {
         'id': 'Mã tài khoản',
-        'ten_tai_khoan': 'Tên tài khoản',
+        'ten_tai_khoan': 'Tên người dùng',
+        'tai_khoan':'Tên tài khoản',
         'mat_khau': 'Mật khẩu',
         'ngay_tao': 'Ngày tạo',
         'email': 'Email',
         'user_role': 'Loại người dùng'
     }
-
 
 class MyView(BaseView):
     def is_accessible(self):

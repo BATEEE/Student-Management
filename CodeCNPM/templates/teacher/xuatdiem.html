@@ -8,8 +8,9 @@
             <div class="content flex">
                 <label>Chọn lớp:</label>
                 <select name="class" id="class">
-                    <option name="" value="">10A1</option>
-                    <option name="" value="">10A2</option>
+                     {% for class in list_class %}
+                    <option name="" value="">{{class.lop.ten_lop}}</option>
+                     {% endfor %}
                 </select>
             </div>
             <div class="content flex">
