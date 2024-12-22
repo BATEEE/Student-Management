@@ -2,14 +2,14 @@
 
 {% block content %}
 <div class="main-container">
-    <form>
+    <form method="post">
         <div class="thems-text">Nhập thông tin</div>
         <div class="content-block flex">
             <div class="content flex">
                 <label>Chọn lớp:</label>
-                <select name="class" id="class">
+                <select name="class" id="class" onchange="changeClass()">
                     {% for class in list_class %}
-                    <option name="" value="">{{class.lop.ten_lop}}</option>
+                    <option name="" value="{{class.lop.id}}">{{class.lop.ten_lop}}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -51,37 +51,24 @@
         <button type="button" class="button left" onclick="generateTable()">Nhập điểm</button>
     </form>
 
-    <form method="post">
+    <form>
         <div class="table-container">
         <table class="score-table">
             <thead>
             <tr>
                 <th>STT</th>
                 <th>Họ tên</th>
-<!--                set colspan = số cột-->
                 <th id="col_15" >Điểm 15’</th>
                 <th id="col_45">Điểm 1 tiết</th>
                 <th>Điểm thi</th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td>1</td>
-                <td>Nguyễn Văn A</td>
-                <!--                Cột 15 phút-->
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <!--                Cột 45 phút-->
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <!--                Cột thi-->
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-            </tr>
+            <tbody id="body-table">
+
             </tbody>
         </table>
         </div>
-        <button type="submit" class="button">Lưu</button>
+        <button type="button    " class="button" onclick="get_score()">Lưu</button>
     </form>
 
 </div>

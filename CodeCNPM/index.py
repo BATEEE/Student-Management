@@ -90,7 +90,7 @@ def add_student_process():
         address = request.form.get('address')
         contact = request.form.get('contact')
         email = request.form.get('email')
-        if datetime.datetime.now().year - int(date[:4]) >= 15 and datetime.datetime.now().year - int(date[:4]) <= 20:
+        if datetime.datetime.now().year - int(date[:4]) >= QuyDinh.AGE_MIN and datetime.datetime.now().year - int(date[:4]) <= QuyDinh.AGE_MAX:
             dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email,
                         ngay_sinh=date, so_dien_thoai=contact)
             msg = "Thêm thành công"
@@ -98,6 +98,7 @@ def add_student_process():
             msg = "Số tuổi yêu cầu từ 15 đến 20"
 
     count = str(HocSinh.query.count() + 1)
+    print(msg)
     return render_template("ems/add_student.html", theme_name=theme_name,
                            count=count, len_of_count=len(count), msg=msg)
 
@@ -298,13 +299,47 @@ def teacher():
 def nhap_diem():
     theme_name = "Nhập điểm"
     list_class = dao.get_list_class_of_teacher()
-    list_subject = dao.get_subject_of_teacher_in_class(21)
-    return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class, list_subject=list_subject
+    return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class
                            , hoc_ki=NamHocHienTai.HOC_KY, nam_hoc=NamHocHienTai.NAM_HOC)
 
-@app.route('/api/gv/nhap_diem')
+@app.route("/api/gv/get-subject/<class_id>", methods=['post'])
+def get_class(class_id):
+    data = request.get_json()
+    list_subject = dao.get_subject_of_teacher_in_class(data['class_id'])
+    subject_json = []
+    for subject in list_subject:
+        json = {
+            "id": subject.giao_vien_day_mon.mon_hoc.id,
+            "ten_mon_hoc": subject.giao_vien_day_mon.mon_hoc.ten_mon_hoc
+        }
+        subject_json.append(json)
+    return jsonify(subject_json)
+
+@app.route('/api/gv/nhap_diem', methods=['post'])
 def get_list_student():
-    pass
+    data = request.get_json()
+    list_student = dao.get_listHocSinh_lop(data['class_id'])
+    list_student_json = []
+    for student in list_student:
+        list_student_json.append({
+            "student_id": student.id,
+            "name": student.ho + " " + student.ten
+        })
+    return jsonify(list_student_json)
+
+@app.route('/api/gv/get-score', methods=['post'])
+def get_score():
+    data = request.get_json()
+    phut_15 = int(data['number_15'])
+    phut_45 = int(data['number_45'])
+    trang_thai = {}
+    for score in data['student_score']:
+        trang_thai = dao.save_score(student_id=score[0], subject_id=data['subject_id'],
+                       score_15=score[1][:phut_15]
+                       , score_45=score[1][phut_15:phut_15 + phut_45], score_cuoi_ky=[score[1][-1]])
+        if trang_thai['success'].__eq__("fail"):
+            break
+    return jsonify(trang_thai)
 
 @app.route('/gv/xuat_diem')
 @role_required(['gv'])
