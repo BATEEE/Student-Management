@@ -1,5 +1,6 @@
 from fileinput import hook_compressed
 
+from flask import session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import query_expression
 from flask_login import current_user
@@ -160,9 +161,10 @@ def get_list_class_of_teacher():
 
 def get_subject_of_teacher_in_class(class_id):
     user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
-    list_subject = Day.query.join(Day.thong_tin_nam_hoc).join(GiaoVienDayMon.id) \
+    list_subject = Day.query.join(Day.thong_tin_nam_hoc).join(Day.giao_vien_day_mon).join(GiaoVienDayMon.mon_hoc) \
         .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC),
-                ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY), Day.lop_id.__eq__(class_id))
+                ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY), Day.lop_id.__eq__(class_id),
+                GiaoVienDayMon.giao_vien_id.__eq__(user.id)).all()
     return list_subject
 
 # Kiem tra hoc sinh da co lop
@@ -181,15 +183,39 @@ def get_hocsinh(idHocSinh):
 def delete_hocsinh(idHocSinh,idLop):
     return HocSinhThuocLop.query.filter(HocSinhThuocLop.lop_id==idLop,HocSinhThuocLop.hoc_sinh_id==idHocSinh).delete()
 
-def get_giaoVienDayLop():
-    return (db.session.query(Day.giao_vien_id)
-            .join(HocSinh,HocSinh.id==HocSinhHocMon.hoc_sinh_id)
-            .join(Diem,Diem.hoc_sinh_hoc_mon_id==Diem.id)
-            .join(LoaiDiem,LoaiDiem.id==Diem.loai_diem_id)
-            .join())
+# def get_giaoVienDayLop():
+#     return (db.session.query(Day.giao_vien_id)
+#             .join(HocSinh,HocSinh.id==HocSinhHocMon.hoc_sinh_id)
+#             .join(Diem,Diem.hoc_sinh_hoc_mon_id==Diem.id)
+#             .join(LoaiDiem,LoaiDiem.id==Diem.loai_diem_id)
+#             .join(Lop,Lop)
 
-#Lay Nhan vien dang dang nhap
-def get_nhanvien():
-    return NhanVien.query.filter(NhanVien.tai_khoan_id.__eq__(current_user.id)).first()
+# def get_hoc_sinh_hoc_mon():
 
+def luu_diem_tuong_ung(score, loai_diem, hshm_id):
+    loai_diem = LoaiDiem.query.filter(LoaiDiem.loai_diem.__eq__(loai_diem)).first()
+    try:
+        for s in score:
+                diem = Diem(so_diem=float(s), loai_diem_id=loai_diem.id, hoc_sinh_hoc_mon_id=hshm_id)
+                db.session.add(diem)
+                db.session.commit()
+    except SQLAlchemy as e:
+        print("Lớp này đã được lưu. Vui lòng nhập lớp khác")
+
+# lưu điểm học sinh thuộc môn đó
+def save_score(student_id, subject_id, score_15, score_45, score_cuoi_ky):
+    ttnh = ThongTinNamHoc.query.filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).first()
+    hshm = HocSinhHocMon(mon_hoc_id=subject_id, hoc_sinh_id=student_id, thong_tin_nam_hoc_id=ttnh.id)
+    duplicates = HocSinhHocMon.query.filter(HocSinhHocMon.mon_hoc_id.__eq__(hshm.mon_hoc_id),
+                                                                       HocSinhHocMon.hoc_sinh_id.__eq__(hshm.hoc_sinh_id),
+                                                                       HocSinhHocMon.thong_tin_nam_hoc_id.__eq__(hshm.thong_tin_nam_hoc_id)).all()
+    if duplicates:
+        print("Lớp này đã lưu điểm")
+        return {"success": "fail", "thong_bao": "Lớp này đã được lưu từ trước. Vui lòng chọn lớp khác"}
+    db.session.add(hshm)
+    db.session.commit()
+    luu_diem_tuong_ung(score_15, "15p", hshm.id)
+    luu_diem_tuong_ung(score_45, "45p", hshm.id)
+    luu_diem_tuong_ung(score_cuoi_ky, "ck", hshm.id)
+    return {"success": "success","thong_bao": "Đã lưu điểm thành công"}
 

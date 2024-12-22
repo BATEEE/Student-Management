@@ -1,3 +1,5 @@
+from turtledemo.penrose import start
+
 from init import db, app
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String, Boolean, Date, Integer, DateTime, ForeignKey, Double, Enum

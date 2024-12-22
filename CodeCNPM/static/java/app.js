@@ -559,7 +559,6 @@ function thongke(){
                 tbody.appendChild(tr);
                 dt.push(tile)
                 labels.push(item)
-                console.log(labels)
 
             }
          const ctx = document.getElementById('myChart').getContext('2d');
@@ -611,20 +610,145 @@ function thongke(){
 
 // Thông báo thêm học sinh
 function thongBaoThemHocSinh(msg) {
-//    if (msg !== "") {
-//        alert(msg)
-//    }
-    console.log(1)
+    s = "POST"
+    fetch("/nv/add", {
+        body: JSON.stringify({
+            "phuong_thuc": s
+         }),
+         headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json()).then(data => {
+
+    })
+}
+
+const MAX_COL_15 = 5
+const MAX_COL_45 = 3
+
+function updateScoreTableUI(data) {
+    col_15 = document.getElementById('col_15')
+    col_45 = document.getElementById('col_45')
+    phut_15 = document.getElementById('15p').value
+    phut_45 = document.getElementById('45p').value
+    phut_15 = parseInt(phut_15, 32)
+    phut_45 = parseInt(phut_45, 32)
+    if (phut_15 > MAX_COL_15 || phut_15 <= 0) {
+        document.getElementById('15p').value = MAX_COL_15
+        phut_15 = MAX_COL_15
+    }
+
+    if (phut_45 > MAX_COL_45 || phut_45 <= 0) {
+        document.getElementById('45p').value = MAX_COL_45
+        phut_45 = MAX_COL_45
+    }
+
+    col_15.setAttribute('colspan', phut_15)
+    col_45.setAttribute('colspan', phut_45)
+    h = ``
+    let count_student = 0
+    let point = `<td class="score"><input type="text" class="scoreInput" oninput="limitInput()"></td>`.repeat(phut_15 + phut_45 + 1)
+    for (count_student = 0; count_student < data.length; count_student++) {
+        h += `<tr name="score-${count_student}" value="${data[count_student].student_id}"><td>${count_student + 1}</td><td id="${count_student}">${data[count_student].name}</td>` + point + `</tr>`
+    }
+    body_table = document.getElementById('body-table')
+    body_table.innerHTML = h
 }
 
 function generateTable() {
-
-                phut_15 = document.getElementById('15p').value
-                phut_45 = document.getElementById('45p').value
-                col_15 = document.getElementById('col_15')
-                col_45 = document.getElementById('col_45')
-                col_15.setAttribute('colspan', phut_15)
-                col_45.setAttribute('colspan', phut_45)
+    class_selected = document.getElementById('class')
+    id = class_selected.options[class_selected.selectedIndex].value
+    phut_15 = document.getElementById('15p').value
+    phut_45 = document.getElementById('45p').value
+    selected_subject = document.getElementById('subject')
+    valueOption = selected_subject.options[selected_subject.selectedIndex].value
+    fetch(`/api/gv/nhap_diem`, {
+         method: "POST",
+         body: JSON.stringify({
+            "class_id": id,
+            "subject_id": valueOption,
+            "count_15p": phut_15,
+            "count_45p": phut_45
+         }),
+         headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json()).then(data => {
+        updateScoreTableUI(data)
+    }).catch(error => {
+        console.error('Error:', error);
+    });
 
 }
+
+document.addEventListener('DOMContentLoaded',()=>{
+    if (window.location.pathname === '/gv/nhap_diem') {
+
+    changeClass();
+}
+})
+
+function changeSelectSubject(data) {
+    selected_subject = document.getElementById('subject')
+    h = ``
+    data.forEach(item => {
+        h += `<option name="" value="${item.id}" >${item.ten_mon_hoc}</option>`
+    })
+    selected_subject.innerHTML = h
+}
+
+function changeClass() {
+    select = document.getElementById('class')
+    valueOption = select.options[select.selectedIndex].value
+    fetch(`/api/gv/get-subject/${valueOption}`, {
+        method: "POST",
+        body: JSON.stringify({
+            "class_id": valueOption
+        }),
+         headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json()).then(data => {
+           changeSelectSubject(data)
+    })
+
+    return valueOption
+}
+
+
+function get_score() {
+    class_id = document.getElementById("class").value
+    subject_id = document.getElementById("subject").value
+    phut_15 = document.getElementById('col_15').getAttribute('colspan')
+    phut_45 = document.getElementById('col_45').getAttribute('colspan')
+    student_row = document.querySelectorAll('#body-table > tr')
+    if (student_row.length != 0) {
+        student_score = []
+        student_row.forEach(item => {
+            console.log(item.getAttribute('value'))
+            col = item.querySelectorAll('.score > input')
+            col_array = [item.getAttribute('value')]
+            col_array.push(Array.from(col).map(col => col.value))
+            student_score.push(col_array)
+        })
+        fetch(`/api/gv/get-score`, {
+            method: "post",
+            body: JSON.stringify({
+                "class_id": class_id,
+                "subject_id": subject_id,
+                "number_15": phut_15,
+                "number_45": phut_45,
+                "student_score": student_score
+            }),
+            headers: {
+            'Content-Type': 'application/json'
+            }
+        }).then(response => response.json()).then(data => {
+            alert(data['thong_bao'])
+        })
+    } else {
+        alert("Chưa có học sinh trong bảng. Vui lòng bấm nhập điểm")
+    }
+}
+
 
