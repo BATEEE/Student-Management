@@ -37,6 +37,9 @@ class TaiKhoan(db.Model, UserMixin):
     nhan_vien = relationship('NhanVien', backref="tai_khoan", lazy=True)
     quan_tri = relationship('QuanTri', backref="tai_khoan", lazy=True)
 
+    def __str__(self):
+        return self.ten_tai_khoan
+
 
 class HocSinh(db.Model):
     id = Column(String(10), primary_key=True)
@@ -63,6 +66,8 @@ class GiaoVien(db.Model):
     ngay_sinh = Column(Date)
     so_dien_thoai = Column(String(10))
     tai_khoan_id = Column(Integer, ForeignKey('tai_khoan.id'), unique=True)
+    def __str__(self):
+        return self.ho+" "+self.ten
     # def __init__(self, id, ho, ten, gioi_tinh, dia_chi, email, ngay_sinh, so_dien_thoai):
     #     self.id = id
     #     self.ho = ho
@@ -89,7 +94,8 @@ class QuanTri(db.Model):
     ngay_sinh = Column(Date)
     so_dien_thoai = Column(String(10))
     tai_khoan_id = Column(Integer, ForeignKey('tai_khoan.id'), unique=True)
-
+    def __str__(self):
+        return self.ho+" "+self.ten
     # __mapper_args__ = {
     #     'polymorphic_identity': 'quan_tri',
     # }
@@ -108,7 +114,7 @@ class NhanVien(db.Model):
     tai_khoan_id = Column(Integer, ForeignKey('tai_khoan.id'), unique=True)
 
     def __str__(self):
-        return self.ten
+        return self.ho+" "+self.ten
 
 
 class Lop(db.Model):

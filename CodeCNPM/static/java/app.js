@@ -559,6 +559,7 @@ function thongke(){
                 tbody.appendChild(tr);
                 dt.push(tile)
                 labels.push(item)
+                console.log(labels)
 
             }
          const ctx = document.getElementById('myChart').getContext('2d');
@@ -626,3 +627,4 @@ function generateTable() {
                 col_45.setAttribute('colspan', phut_45)
 
 }
+
