@@ -683,13 +683,19 @@ function generateTable() {
 
 document.addEventListener('DOMContentLoaded',()=>{
     if (window.location.pathname === '/gv/nhap_diem') {
-
     changeClass();
 }
+    if(window.location.pathname=='/gv/xuat_diem'){
+    thaydoiNamHoc()
+    }
 })
 
 function changeSelectSubject(data) {
     selected_subject = document.getElementById('subject')
+   if(!selected_subject)
+   {
+   return
+   }
     h = ``
     data.forEach(item => {
         h += `<option name="" value="${item.id}" >${item.ten_mon_hoc}</option>`
@@ -698,6 +704,7 @@ function changeSelectSubject(data) {
 }
 
 function changeClass() {
+console.log("Doi lop")
     select = document.getElementById('class')
     valueOption = select.options[select.selectedIndex].value
     fetch(`/api/gv/get-subject/${valueOption}`, {
@@ -751,4 +758,21 @@ function get_score() {
     }
 }
 
+function thaydoiNamHoc(){
+    nameClass=document.getElementById('name_class')
+    select_namHoc=document.getElementById('year')
+    namHoc=select_namHoc.options[select_namHoc.selectedIndex].value
+       fetch(`/gv/xuat_diem/getclass?namHoc=${namHoc}`, {
+            method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+        }).then(response => response.json()).then(data => {
+             nameClass.value=data["ten_lop"]
+        })
+}
 
+
+function loadDanhSachDiem(){
+
+}

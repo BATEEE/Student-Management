@@ -4,6 +4,8 @@ from flask import session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import query_expression
 from flask_login import current_user
+from sqlalchemy.testing.suite.test_reflection import users
+
 from models import TaiKhoan, UserRole, GiaoVien, QuanTri, MonHoc, HocSinh, HocSinhThuocLop, Lop, LoaiDiem, Diem, \
 HocSinhHocMon, ThongTinNamHoc, NamHocHienTai, NhanVien, Day, GiaoVienDayMon
 
@@ -219,3 +221,39 @@ def save_score(student_id, subject_id, score_15, score_45, score_cuoi_ky):
     luu_diem_tuong_ung(score_cuoi_ky, "ck", hshm.id)
     return {"success": "success","thong_bao": "Đã lưu điểm thành công"}
 
+#Lay cac nam hoc da day
+def get_namhoc_giaovienday():
+    user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
+    # return ThongTinNamHoc.session.query().join(Day,Day.thong_tin_nam_hoc_id.__eq__(ThongTinNamHoc.id))
+    #         .join(GiaoVien,GiaoVien.id.__eq__(user.id)).filter(Day.chu_nhiem.__eq__(True))).all()
+    return (db.session.query(Day).join(ThongTinNamHoc,ThongTinNamHoc.id==Day.thong_tin_nam_hoc_id)
+            .join(GiaoVienDayMon,GiaoVienDayMon.id==Day.giao_vien_day_mon_id)
+            .join(GiaoVien,GiaoVienDayMon.giao_vien_id==GiaoVien.id)
+            .filter(GiaoVien.tai_khoan_id.__eq__(user.id),Day.chu_nhiem.__eq__(True))).all()
+
+#Lay lop theo nam hoc
+def get_lop_namhoc(namhoc):
+    user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
+    return ((db.session.query(Day).join(Lop,Lop.id==Day.lop_id)
+            .join(ThongTinNamHoc,ThongTinNamHoc.id==Day.thong_tin_nam_hoc_id))
+            .join(GiaoVienDayMon,GiaoVienDayMon.id==Day.giao_vien_day_mon_id)
+            .join(GiaoVien,GiaoVienDayMon.giao_vien_id==GiaoVien.id)
+            .filter(ThongTinNamHoc.nam_hoc==namhoc,GiaoVien.tai_khoan_id.__eq__(user.id),Day.chu_nhiem.__eq__(True)).first())
+
+#lay danh sach hoc sinh diem TBHK
+def get_diemTB_hocKi(namhoc=None,lop=None):
+    query = ((db.session.query(
+        Lop.ten_lop.label('ten_lop'),
+        HocSinh.id.label('id_hoc_sinh'),
+        ThongTinNamHoc.hoc_ki.label('hoc_ki')
+        ,(func.sum((func.sum(Diem.so_diem * LoaiDiem.he_so) / func.sum(LoaiDiem.he_so)).label('diem_trung_binh'))/func.count(MonHoc.id)))
+                .join(HocSinhThuocLop, HocSinhThuocLop.lop_id == Lop.id)
+                .join(HocSinh, HocSinhThuocLop.hoc_sinh_id == HocSinh.id)
+                .join(HocSinhHocMon, HocSinhHocMon.hoc_sinh_id == HocSinh.id)
+                .join(Diem, Diem.hoc_sinh_hoc_mon_id == HocSinhHocMon.id)
+                .join(LoaiDiem, Diem.loai_diem_id == LoaiDiem.id)
+                .join(MonHoc, HocSinhHocMon.mon_hoc_id == MonHoc.id)
+                .join(ThongTinNamHoc, HocSinhHocMon.thong_tin_nam_hoc_id == ThongTinNamHoc.id))
+             .filter(Lop.ten_lop==lop,ThongTinNamHoc.nam_hoc==namhoc))
+    query = query.group_by(Lop.ten_lop, HocSinh.id)
+    return query.all()

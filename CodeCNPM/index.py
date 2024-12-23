@@ -349,7 +349,9 @@ def get_score():
 @login_required
 def xuat_diem():
     theme_name = "Xuất điểm"
-    return render_template('teacher/xuatdiem.html', theme_name=theme_name)
+    list_class = dao.get_list_class_of_teacher()
+    list_namhoc=dao.get_namhoc_giaovienday()
+    return render_template('teacher/xuatdiem.html', theme_name=theme_name,list_class=list_class,list_namhoc=list_namhoc)
 
 
 @login.user_loader
@@ -374,7 +376,19 @@ def log_out():
     return redirect('login')
 
 
-#
+#lay lop theo nam hoc
+@app.route('/gv/xuat_diem/getclass', methods=['GET'])
+def get_():
+    nam_hoc = request.args.get('namHoc')
+    result=dao.get_lop_namhoc(nam_hoc)
+    name_class={
+        "id": result.lop.id,
+        "ten_lop":result.lop.ten_lop
+    }
+    print(dao.get_diemTB_hocKi(namhoc=2024,lop="10A1"))
+    return jsonify(name_class)
+
+
 @app.route('/admin/get_thongke', methods=['GET'])
 def get_thongke():
     nam_hoc = request.args.get('nam_hoc')
