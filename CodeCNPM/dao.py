@@ -90,10 +90,21 @@ def add_student_into_class(list_student, class_id):
 
 # Tao danh sach lop
 def create_class(number_of_class, class_id):
-    student_of_class = HocSinhThuocLop.query.all() # Lấy danh sách học sinh đã có lớp
-    new_students = [x.hoc_sinh_id for x in student_of_class] # Lọc học sinh đã có lớp và học sinh chưa có
+    # Lấy danh sách lớp
+    lop = Lop.query.filter(Lop.id.__eq__(class_id)).first()
+    # Lấy thông tin năm học của kỳ trước ví dụ học kỳ 2 thì xuống học kỳ 1 còn năm thì giảm nếu học kỳ là 1 còn nếu học kỳ là 2 thì sẽ giữ nguyên
+    nam_hoc, hoc_ky, khoi_lop = (int(NamHocHienTai.NAM_HOC), 1, lop.khoi_lop) if NamHocHienTai.HOC_KY.__eq__(2) else (int(NamHocHienTai.NAM_HOC) - 1, 2, lop.khoi_lop - 1)
+    # Lấy danh sách học sinh đã học ở kỳ trước tương đương khối lớp đã học ở kỳ trước
+    student_last_year = db.session.query(HocSinh).join(HocSinhThuocLop, HocSinhThuocLop.hoc_sinh_id.__eq__(HocSinh.id)) \
+                        .join(ThongTinNamHoc, HocSinhThuocLop.thong_tin_nam_hoc_id.__eq__(ThongTinNamHoc.id)) \
+                        .join(Lop, HocSinhThuocLop.lop_id.__eq__(Lop.id)) \
+                        .filter(ThongTinNamHoc.nam_hoc.__eq__(nam_hoc), ThongTinNamHoc.hoc_ki.__eq__(hoc_ky), Lop.khoi_lop.__eq__(khoi_lop)).subquery()
+    # student_current_year = HocSinhThuocLop.query.filter(HocSinhThuocLop.thong_tin_nam_hoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC)).all()
+    student_of_class = (HocSinhThuocLop.query.join(HocSinhThuocLop.thong_tin_nam_hoc)
+                        .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).all()) # Lấy danh sách học sinh đã có lớp
+    new_students = [x.hoc_sinh_id for x in student_of_class]  # Lọc học sinh đã có lớp và học sinh chưa có
     # random từ danh sách học sinh bỏ đi danh sách học sinh của new student vì chỉ cần lấy danh sách học sinh chưa có lớp
-    random_student = (HocSinh.query.filter(HocSinh.id.notin_(new_students)).order_by(func.random()).order_by(HocSinh.ten.asc()).limit(number_of_class).all())
+    random_student = db.session.query(student_last_year).filter(student_last_year.c.id.notin_(new_students)).order_by(func.random()).order_by(student_last_year.c.ten.asc()).limit(number_of_class).all()
     return random_student
 
 # sửa thông tin học sinh
@@ -150,7 +161,7 @@ def get_listHocSinh_lop(idlop):
       return ((db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
               .join(HocSinhThuocLop,HocSinhThuocLop.hoc_sinh_id==HocSinh.id)
               .join(Lop,HocSinhThuocLop.lop_id.__eq__(Lop.id))).filter(Lop.id.__eq__(idlop))
-              .join(ThongTinNamHoc,ThongTinNamHoc.id==HocSinhThuocLop.thong_tin_nam_hoc_id).filter(ThongTinNamHoc.nam_hoc.__eq__(2024)).all())
+              .join(ThongTinNamHoc,ThongTinNamHoc.id==HocSinhThuocLop.thong_tin_nam_hoc_id).filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).all())
 
 def get_list_class_of_teacher():
     user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
@@ -210,7 +221,6 @@ def save_score(student_id, subject_id, score_15, score_45, score_cuoi_ky):
                                                                        HocSinhHocMon.hoc_sinh_id.__eq__(hshm.hoc_sinh_id),
                                                                        HocSinhHocMon.thong_tin_nam_hoc_id.__eq__(hshm.thong_tin_nam_hoc_id)).all()
     if duplicates:
-        print("Lớp này đã lưu điểm")
         return {"success": "fail", "thong_bao": "Lớp này đã được lưu từ trước. Vui lòng chọn lớp khác"}
     db.session.add(hshm)
     db.session.commit()
@@ -218,4 +228,15 @@ def save_score(student_id, subject_id, score_15, score_45, score_cuoi_ky):
     luu_diem_tuong_ung(score_45, "45p", hshm.id)
     luu_diem_tuong_ung(score_cuoi_ky, "ck", hshm.id)
     return {"success": "success","thong_bao": "Đã lưu điểm thành công"}
+
+def get_score(subject_id, student):
+    ttnh = ThongTinNamHoc.query.filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC),ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).first()
+    hoc_sinh_hoc_mon = HocSinhHocMon.query.filter(HocSinhHocMon.thong_tin_nam_hoc_id.__eq__(ttnh.id), HocSinhHocMon.mon_hoc_id.__eq__(subject_id), HocSinhHocMon.hoc_sinh_id.__eq__(student.id)).first()
+    if not hoc_sinh_hoc_mon:
+        return
+    score_of_student = Diem.query.filter(Diem.hoc_sinh_hoc_mon_id.__eq__(hoc_sinh_hoc_mon.id)).all()
+    test_15 = [x.so_diem for x in score_of_student if x.loai_diem.loai_diem.__eq__("15p")]
+    test_45 = [x.so_diem for x in score_of_student if x.loai_diem.loai_diem.__eq__("45p")]
+    test_ck = [x.so_diem for x in score_of_student if x.loai_diem.loai_diem.__eq__("ck")]
+    return [test_15, test_45, test_ck]
 
