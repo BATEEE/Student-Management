@@ -1,5 +1,4 @@
 let currentchar=null
-
 const toggleButton = document.getElementById('toggle-btn')
 const sidebar = document.getElementById('sidebar')
 function toggleSidebar() {
@@ -234,18 +233,55 @@ function AddStudentFunc() {
     }
 }
 //Điều chỉnh danh lớp
-document.addEventListener('DOMContentLoaded', function() {
+let dem=0
+let selectedStudents = [];
+document.addEventListener('DOMContentLoaded',()=>{
+    if (window.location.pathname === '/nv/adjust_class') {
+
     loadSiSo();
-});
+}
+})
+
+//Xóa học sinh khỏi lớp UI
+function delete_hocSinhUI(id,class_id){
+
+     if(selectedStudents.find(student => student.id === id && student.id_class === class_id))
+        selectedStudents=selectedStudents.filter(student=> student.id!==id && student.id_class!==class_id)
+     if (confirm("Bạn chắc chắn xóa không?") === true) {
+        fetch(`/api/adjust_class/${id}&${class_id}`, {
+            method: "delete"
+        }).then(res => res.json()).then(data => {
+            alert(data.message)
+            document.getElementById(`studentId${id}`).remove();
+            const selectElement=document.getElementById('class')
+
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const updateSiSo=document.getElementById('siso')
+            const siSo=parseInt(updateSiSo.value)-1;
+            updateSiSo.value=siSo
+            selectedOption.setAttribute("data-siso",siSo)
+            dem--
+            loadSiSo()
+        }).catch(error => {
+            alert("Có lỗi xảy ra. Vui lòng thử lại.");
+        });
+    }
+}
+
 
 function loadSiSo(){
+    dem=0
     const selectElement=document.getElementById('class')
+   if(selectElement.selectedIndex===-1)
+   {
+   return;
+   }
     const selectedOption = selectElement.options[selectElement.selectedIndex];
     const siSo=selectedOption.getAttribute("data-siso");
     const updateSiSo=document.getElementById('siso')
     updateSiSo.value=siSo
     const idLop = selectElement.options[selectElement.selectedIndex].id;
-
+    selectedStudents=[]
     fetch(`/nv/adjust_class/get_listStudent?id_lop=${idLop}`,{
     method: 'GET',
         headers: {
@@ -258,17 +294,17 @@ function loadSiSo(){
             {
             const rowStudent=document.getElementById('hocsinh')
             rowStudent.innerHTML=""
-            let dem=1;
             data.forEach(item =>{
 
             const tr = document.createElement('tr');
+            tr.setAttribute('id','studentId'+item.id)
             const tdStt = document.createElement('td');
             const tdHoTen = document.createElement('td');
             const tdGioiTinh = document.createElement('td');
             const tdNgaySinh = document.createElement('td');
             const tdDiaChi=document.createElement('td')
 
-            tdStt.textContent=dem++
+            tdStt.textContent=++dem
             tdHoTen.textContent=item.ho+" "+item.ten
             tdGioiTinh.textContent=item.gioi_tinh ? "Nữ" : "Nam"
             tdNgaySinh.textContent=item.ngay_sinh
@@ -282,9 +318,16 @@ function loadSiSo(){
 
             let tdElement = document.createElement('td');
             tdElement.classList.add('delete-student');
+            tdElement.setAttribute('id',item.id)
             let buttonElement = document.createElement('button');
             buttonElement.setAttribute('type', 'submit');
             buttonElement.textContent = 'x';
+
+            buttonElement.setAttribute('id',item.id)
+            buttonElement.addEventListener('click',function (){
+            delete_hocSinhUI(item.id,idLop)
+            })
+
             tdElement.appendChild(buttonElement);
             tr.appendChild(tdElement)
             rowStudent.appendChild(tr)
@@ -294,30 +337,168 @@ function loadSiSo(){
         .catch(error => console.error('Error:', error));
 }
 //
+function updateAdjustTable(){
+            const tr = document.createElement('tr');
+            const tdStt = document.createElement('td');
+            const tdHoTen = document.createElement('td');
+            const tdGioiTinh = document.createElement('td');
+            const tdNgaySinh = document.createElement('td');
+            const tdDiaChi=document.createElement('td')
+
+            tdStt.textContent=++dem
+            tdHoTen.textContent=item.ho+" "+item.ten
+            tdGioiTinh.textContent=item.gioi_tinh ? "Nữ" : "Nam"
+            tdNgaySinh.textContent=item.ngay_sinh
+            tdDiaChi.textContent=item.dia_chi
+            tr.appendChild(tdStt)
+            tr.appendChild(tdHoTen)
+            tr.appendChild(tdGioiTinh)
+            tr.appendChild(tdNgaySinh)
+            tr.appendChild(tdDiaChi);
+            let tdElement = document.createElement('td');
+            tdElement.classList.add('delete-student');
+            let buttonElement = document.createElement('button');
+            buttonElement.setAttribute('type', 'submit');
+            buttonElement.textContent = 'x';
+            tdElement.appendChild(buttonElement);
+            tr.appendChild(tdElement)
+}
+
+function AddStudentToTable() {
+    var studentId = document.getElementById('student_id').value;
+    var selectElement=document.getElementById('class');
+    if(selectElement.selectedIndex===-1)
+    return
+    var classId = selectElement.options[selectElement.selectedIndex].id;
+    if (studentId && classId) {
+        fetch(`/nv/adjust_class/get_hocSinh?student_id=${studentId}&class_id=${classId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if ((Array.isArray(data) && data.length === 0)) {
+               alert("Lỗi đã có học sinh này trong lớp hoặc nhập sai id!")
+               return
+            }
+            if (selectedStudents.find(student => student.id === data["id"] && student.id_class === classId)) {
+            alert("Học sinh này đã được thêm: " + data["ho_ten"]);
+            return;
+               }
+            const rowStudent=document.getElementById('hocsinh')
+            const tr = document.createElement('tr');
+            tr.setAttribute('id','studentId'+data["id"])
+            const tdStt = document.createElement('td');
+            const tdHoTen = document.createElement('td');
+            const tdGioiTinh = document.createElement('td');
+            const tdNgaySinh = document.createElement('td');
+            const tdDiaChi=document.createElement('td')
+
+            tdStt.textContent=++dem
+            tdHoTen.textContent=data["ho_ten"]
+            tdGioiTinh.textContent=data["gioi_tinh"]
+            tdNgaySinh.textContent=data["ngay_sinh"]
+            tdDiaChi.textContent=data["dia_chi"]
+
+            tr.appendChild(tdStt)
+            tr.appendChild(tdHoTen)
+            tr.appendChild(tdGioiTinh)
+            tr.appendChild(tdNgaySinh)
+            tr.appendChild(tdDiaChi);
+
+            let tdElement = document.createElement('td');
+            tdElement.classList.add('delete-student');
+            let buttonElement = document.createElement('button');
+            buttonElement.setAttribute('type', 'submit');
+            buttonElement.textContent = 'x';
+
+            //gan id va bat su kien click
+            buttonElement.setAttribute('id',data["id"])
+            buttonElement.addEventListener('click',function (){
+            delete_hocSinhUI(data["id"],classId)
+            })
+
+            tdElement.appendChild(buttonElement);
+            tr.appendChild(tdElement)
+            rowStudent.appendChild(tr)
+            selectedStudents.push({
+            "id":data["id"],
+            "id_class":classId
+            })
+
+            const selectElement=document.getElementById('class')
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const updateSiSo=document.getElementById('siso')
+            const siSo=parseInt(updateSiSo.value)+1;
+            updateSiSo.value=siSo
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+        });
+    } else {
+        alert('Vui lòng nhập ID học sinh!');
+    }
+}
 
 function AddStudentList() {
+    if (Array.isArray(selectedStudents) && selectedStudents.length !== 0) {
+        fetch(`/nv/adjust_class`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+               students:selectedStudents
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                selectedStudents=[]
+                const selectElement=document.getElementById('class')
+                const selectedOption = selectElement.options[selectElement.selectedIndex];
+                const siSo=document.getElementById("siso")
+                selectedOption.setAttribute("data-siso",parseInt(siSo.value))
+            } else {
+                alert('Lỗi: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+        });
+    } else {
+        alert('Vui lòng thực hiện thay đổi!');
+    }
 }
+
 
 //Nhập input cho điểm
 function limitInput() {
   var inputs = document.querySelectorAll('.scoreInput');
 
-  // Duyệt qua từng input
   inputs.forEach(function(input) {
     var value = input.value;
 
-    // Kiểm tra giá trị có phải là số thập phân hợp lệ
-    if (/^\d+(\.\d{0,1})?$/.test(value)) {
-      // Giới hạn giá trị không được vượt quá 10
+    // Kiểm tra và giới hạn giá trị hợp lệ từ 0 đến 10 với tối đa 1 chữ số sau dấu chấm
+    if (/^\d{0,2}(\.\d{0,1})?$/.test(value)) {
       if (parseFloat(value) > 10) {
         input.value = "10";
       }
     } else {
-      // Nếu không phải là số hợp lệ, chỉ giữ lại phần số và một dấu chấm
+      // Nếu không hợp lệ, chỉ giữ lại phần số hợp lệ (bao gồm dấu chấm thập phân)
       input.value = value
-        .replace(/[^0-9.]/g, '') // Loại bỏ ký tự không phải số và dấu chấm
-        .replace(/(\..*)\./g, '$1') // Loại bỏ dấu chấm thứ hai nếu có
-        .slice(0, 4); // Giới hạn độ dài nhập liệu
+        .replace(/[^0-9.]/g, '') // Xóa ký tự không phải số hoặc dấu chấm
+        .replace(/(\..*?)\..*/g, '$1') // Chỉ giữ lại 1 dấu chấm
+        .replace(/^0+(\d)/, '$1') // Xóa số 0 ở đầu (nếu có nhiều số 0)
+        .slice(0, 4); // Giới hạn tối đa 4 ký tự (ví dụ: "10.0")
+
+      // Nếu giá trị vượt quá 10, gán lại về 10
+      if (parseFloat(input.value) > 10) {
+        input.value = "10";
+      }
     }
   });
 }
@@ -437,8 +618,185 @@ function thongke(){
 
 // Thông báo thêm học sinh
 function thongBaoThemHocSinh(msg) {
-//    if (msg !== "") {
-//        alert(msg)
-//    }
-    console.log(1)
+    s = "POST"
+    fetch("/nv/add", {
+        body: JSON.stringify({
+            "phuong_thuc": s
+         }),
+         headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json()).then(data => {
+
+    })
 }
+
+const MAX_COL_15 = 5
+const MAX_COL_45 = 3
+
+function updateScoreTableUI(data) {
+    col_15 = document.getElementById('col_15')
+    col_45 = document.getElementById('col_45')
+    phut_15 = document.getElementById('15p').value
+    phut_45 = document.getElementById('45p').value
+    phut_15 = parseInt(phut_15, 32)
+    phut_45 = parseInt(phut_45, 32)
+    if (phut_15 > MAX_COL_15 || phut_15 <= 0) {
+        document.getElementById('15p').value = MAX_COL_15
+        phut_15 = MAX_COL_15
+    }
+
+    if (phut_45 > MAX_COL_45 || phut_45 <= 0) {
+        document.getElementById('45p').value = MAX_COL_45
+        phut_45 = MAX_COL_45
+    }
+
+    col_15.setAttribute('colspan', phut_15)
+    col_45.setAttribute('colspan', phut_45)
+    h = ``
+    let count_student = 0
+    let point = `<td class="score"><input type="number" step="0.01" class="scoreInput" oninput="limitInput()"></td>`.repeat(phut_15 + phut_45 + 1)
+    for (count_student = 0; count_student < data.length; count_student++) {
+        h += `<tr name="score-${count_student}" value="${data[count_student].student_id}"><td>${count_student + 1}</td><td id="${count_student}">${data[count_student].name}</td>` + point + `</tr>`
+    }
+    body_table = document.getElementById('body-table')
+    body_table.innerHTML = h
+}
+
+function generateTable() {
+    class_selected = document.getElementById('class')
+    id = class_selected.options[class_selected.selectedIndex].value
+    phut_15 = document.getElementById('15p').value
+    phut_45 = document.getElementById('45p').value
+    selected_subject = document.getElementById('subject')
+    valueOption = selected_subject.options[selected_subject.selectedIndex].value
+    fetch(`/api/gv/nhap_diem`, {
+         method: "POST",
+         body: JSON.stringify({
+            "class_id": id,
+            "subject_id": valueOption,
+            "count_15p": phut_15,
+            "count_45p": phut_45
+         }),
+         headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json()).then(data => {
+        updateScoreTableUI(data)
+    }).catch(error => {
+        console.error('Error:', error);
+    });
+
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+    if (window.location.pathname === '/gv/nhap_diem') {
+
+    changeClass();
+}
+})
+
+function changeSelectSubject(data) {
+    selected_subject = document.getElementById('subject')
+    h = ``
+    data.forEach(item => {
+        h += `<option name="" value="${item.id}" >${item.ten_mon_hoc}</option>`
+    })
+    selected_subject.innerHTML = h
+}
+
+function changeClass() {
+    select = document.getElementById('class')
+    valueOption = select.options[select.selectedIndex].value
+    fetch(`/api/gv/get-subject/${valueOption}`, {
+        method: "POST",
+        body: JSON.stringify({
+            "class_id": valueOption
+        }),
+         headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json()).then(data => {
+           changeSelectSubject(data)
+    })
+
+    return valueOption
+}
+
+
+function get_score() {
+    class_id = document.getElementById("class").value
+    subject_id = document.getElementById("subject").value
+    phut_15 = document.getElementById('col_15').getAttribute('colspan')
+    phut_45 = document.getElementById('col_45').getAttribute('colspan')
+    student_row = document.querySelectorAll('#body-table > tr')
+    run = true
+    if (student_row.length != 0) {
+        student_score = []
+        student_row.forEach(item => {
+            col = item.querySelectorAll('.score > input')
+            n = col.length
+            for (let i = 0; i < n; i++) {
+                if (col[i].value == "") {
+                    alert("Bạn nhập chưa đủ cột")
+                    run = false
+                    return
+                }
+            }
+            col_array = [item.getAttribute('value')]
+            col_array.push(Array.from(col).map(col => col.value))
+            student_score.push(col_array)
+        })
+        if (run) {
+            fetch(`/api/gv/get-score`, {
+                method: "post",
+                body: JSON.stringify({
+                    "class_id": class_id,
+                    "subject_id": subject_id,
+                    "number_15": phut_15,
+                    "number_45": phut_45,
+                    "student_score": student_score
+                }),
+                headers: {
+                'Content-Type': 'application/json'
+                }
+            }).then(response => response.json()).then(data => {
+               if (data) {
+                    alert(data['thong_bao'])
+                }
+            })
+        }
+    } else {
+        alert("Chưa có học sinh trong bảng. Vui lòng bấm nhập điểm")
+    }
+}
+
+function showScore(data) {
+    col_15 = document.getElementById('col_15')
+    col_45 = document.getElementById('col_45')
+    col_15.setAttribute('colspan', 1)
+    col_45.setAttribute('colspan', 1)
+    h = ``
+    let count_student = 0
+    for (count_student = 0; count_student < data.length; count_student++) {
+        let point = `<td class="score">${data[count_student]['score']['test_15'].join('        ')}</td><td class="score">${data[count_student]['score']['test_45'].join('        ')}</td><td class="score">${data[count_student]['score']['test_ck'].join('        ')}</td>`
+        h += `<tr name="score-${count_student}" value="${data[count_student].student_id}"><td>${count_student + 1}</td><td id="${count_student}">${data[count_student].name}</td>` + point + `</tr>`
+    }
+    body_table = document.getElementById('body-table')
+    body_table.innerHTML = h
+}
+
+function xemDiem() {
+    class_id = document.getElementById("class").value
+    subject_id = document.getElementById("subject").value
+    fetch(`/api/gv/nhap_diem/xem_diem?class_id=${class_id}&subject_id=${subject_id}`, {
+        method: "GET"
+    }).then(response => response.json()).then(data => {
+        if (data.length == 0) {
+            alert("Lớp này chưa được nhập điểm")
+        } else {
+            showScore(data)
+        }
+    })
+}
+

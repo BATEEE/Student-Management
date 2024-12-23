@@ -23,7 +23,7 @@
 
             <div class="content flex">
                 <label for="class">Năm học:</label>
-                <input type="text" name="" value="2024-2025" readonly/>
+                <input type="text" name="" value="{{nam_hoc + ' - ' + hoc_ky}}" readonly/>
             </div>
         </div>
 
@@ -62,22 +62,22 @@
         </div>
         <div class="table-func">
             <button type="button" onclick="deleteAllStudentFromTable()">Hủy</button>
-            <button type="button" onclick="AddStudentFunc()" id="add-button">Thêm</button>
+<!--            <button type="button" onclick="AddStudentFunc()" id="add-button">Thêm</button>-->
             <button type="submit" onclick="">Lưu</button>
         </div>
     </form>
 
-    <div class="add-into-list">
-        <div class="content-block flex">
-            <div class="content flex">
-                <label for="class">Nhập id học sinh:</label>
-                <input type="text" name="" placeholder=""/>
-            </div>
-        </div>
-        <div class="table-func">
-            <button onclick="AddStudentFunc()">Hủy</button>
-            <button onclick="AddStudentList()">Thêm</button>
-        </div>
-    </div>
+<!--    <div class="add-into-list">-->
+<!--        <div class="content-block flex">-->
+<!--            <div class="content flex">-->
+<!--                <label for="class">Nhập id học sinh:</label>-->
+<!--                <input type="text" name="" placeholder=""/>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="table-func">-->
+<!--            <button onclick="AddStudentFunc()">Hủy</button>-->
+<!--            <button onclick="AddStudentList()">Thêm</button>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
 {% endblock %}

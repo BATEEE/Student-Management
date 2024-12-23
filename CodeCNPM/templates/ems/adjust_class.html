@@ -8,15 +8,21 @@
             <div class="content flex">
                 <label for="class">Lớp:</label>
                 <select name="class" id="class" onchange="loadSiSo()">
-                    {% for ds in danhsachlop %}
+                    {% if danhsachlop %}
+                        {% for ds in danhsachlop %}
                        <option  id="{{ds.id}}" data-siso="{{ds.siso}}">{{ds.ten_lop}}</option>
-                    {% endfor  %}
+                        {% endfor  %}
+                    {% endif %}
                 </select>
             </div>
 
             <div class="content flex">
                 <label for="class">Sĩ số:</label>
-                <input type="number" name="" value="{{danhsachlop[0].siso}}" id="siso" readonly/>
+                {% if danhsachlop  %}
+                <input type="number" name="" value="{{ danhsachlop[0].siso }}" id="siso" readonly />
+                {% else %}
+                 <input type="number" name="" value="" id="siso" readonly />
+                {% endif %}
             </div>
         </div>
     </form>
@@ -46,19 +52,19 @@
     <div class="table-func">
         <button onclick="">Hủy</button>
         <button onclick="AddStudentFunc()" id="add-button">Thêm</button>
-        <button onclick="">Lưu</button>
+        <button onclick="AddStudentList()">Lưu</button>
     </div>
 
     <div class="add-into-list">
         <div class="content-block flex">
             <div class="content flex">
                 <label for="class">Nhập id học sinh:</label>
-                <input type="text" name="" placeholder=""/>
+                <input type="text" name="" placeholder="" id="student_id"/>
             </div>
         </div>
         <div class="table-func">
             <button onclick="AddStudentFunc()">Hủy</button>
-            <button onclick="AddStudentList()">Thêm</button>
+            <button onclick="AddStudentToTable()">Thêm</button>
         </div>
     </div>
 </div>

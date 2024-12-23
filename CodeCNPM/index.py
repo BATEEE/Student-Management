@@ -67,7 +67,7 @@ def subject():
 @role_required(['nv'])
 @login_required
 def employee():
-    nv = NhanVien.query.filter(NhanVien.id == current_user.id).first()
+    nv = NhanVien.query.filter(current_user.id.__eq__(NhanVien.tai_khoan_id))
     return render_template('ems/employee.html', nv=nv)
 
 
@@ -243,7 +243,7 @@ def get_hocSinhTheoLop():
 @role_required(['gv'])
 @login_required
 def teacher():
-    gv = GiaoVien.query.filter(GiaoVien.id == current_user.id).first()
+    gv = GiaoVien.query.filter(current_user.id.__eq__(GiaoVien.tai_khoan_id))
     return render_template('teacher/teacher.html', gv=gv)
 
 

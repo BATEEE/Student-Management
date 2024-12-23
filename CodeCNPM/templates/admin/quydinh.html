@@ -1,0 +1,19 @@
+{% extends 'admin/base.html' %}
+{% block body %}
+<h3>Quy định hiện tại</h3>
+<table class="table">
+    <tr>
+        <th>Sỉ Số</th>
+        <td>{{ quy_dinh.SI_SO }}</td>
+    </tr>
+    <tr>
+        <th>Tuổi tối đa</th>
+        <td>{{ quy_dinh.AGE_MAX }}</td>
+    </tr>
+    <tr>
+        <th>Tuổi tối thiểu</th>
+        <td>{{ quy_dinh.AGE_MIN }}</td>
+    </tr>
+</table>
+<a href="{{url_for('quydinh.edit')}}" class="btn btn-primary">Chỉnh sửa</a>
+{% endblock %}
