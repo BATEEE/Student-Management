@@ -306,18 +306,22 @@ function limitInput() {
   inputs.forEach(function(input) {
     var value = input.value;
 
-    // Kiểm tra xem giá trị có phải là số và có tối đa 2 chữ số
-    if (/^\d{1,2}$/.test(value)) {
-      // Cắt nếu giá trị vượt quá 10
-      if (value > 10) {
+    // Kiểm tra giá trị có phải là số thập phân hợp lệ
+    if (/^\d+(\.\d{0,1})?$/.test(value)) {
+      // Giới hạn giá trị không được vượt quá 10
+      if (parseFloat(value) > 10) {
         input.value = "10";
       }
     } else {
-      // Nếu không phải là số hợp lệ, chỉ giữ lại phần số
-      input.value = value.replace(/[^0-9]/g, '').slice(0, 2);
+      // Nếu không phải là số hợp lệ, chỉ giữ lại phần số và một dấu chấm
+      input.value = value
+        .replace(/[^0-9.]/g, '') // Loại bỏ ký tự không phải số và dấu chấm
+        .replace(/(\..*)\./g, '$1') // Loại bỏ dấu chấm thứ hai nếu có
+        .slice(0, 4); // Giới hạn độ dài nhập liệu
     }
   });
 }
+
 
 // Thống kê
 let char=null

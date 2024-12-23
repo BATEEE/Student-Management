@@ -322,5 +322,5 @@ if __name__ == '__main__':
         db.session.commit()
         db.session.add_all([taikhoan1, taikhoan2, taikhoan3])
         db.session.commit()
-        db.session.add_all([hoc_sinh_thuoc_lop1, hoc_sinh_thuoc_lop2, quantri, nv, giaovien ])
+        db.session.add_all([hoc_sinh_thuoc_lop1, hoc_sinh_thuoc_lop2, quantri, nv, giaovien])
         db.session.commit()

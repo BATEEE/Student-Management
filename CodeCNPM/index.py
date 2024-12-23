@@ -3,7 +3,7 @@ from flask import request, redirect, render_template, session, abort, jsonify
 from functools import wraps
 import dao
 from flask_login import login_user, current_user
-from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh
+from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NhanVien, GiaoVien
 from models import HocSinh, ThongTinNamHoc, Lop
 from init import app, login, db
 from flask_login import login_user, current_user, login_required, logout_user
@@ -67,7 +67,8 @@ def subject():
 @role_required(['nv'])
 @login_required
 def employee():
-    return render_template('ems/employee.html')
+    nv = NhanVien.query.filter(NhanVien.id == current_user.id).first()
+    return render_template('ems/employee.html', nv=nv)
 
 
 @app.route('/nv/add', methods=['get', 'post'])
@@ -242,7 +243,8 @@ def get_hocSinhTheoLop():
 @role_required(['gv'])
 @login_required
 def teacher():
-    return render_template('teacher/teacher.html')
+    gv = GiaoVien.query.filter(GiaoVien.id == current_user.id).first()
+    return render_template('teacher/teacher.html', gv=gv)
 
 
 @app.route('/gv/nhap_diem')
