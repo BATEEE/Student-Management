@@ -367,11 +367,12 @@ function updateAdjustTable(){
 function AddStudentToTable() {
     var studentId = document.getElementById('student_id').value;
     var selectElement=document.getElementById('class');
+    var siSo=document.getElementById('siso')
     if(selectElement.selectedIndex===-1)
     return
     var classId = selectElement.options[selectElement.selectedIndex].id;
     if (studentId && classId) {
-        fetch(`/nv/adjust_class/get_hocSinh?student_id=${studentId}&class_id=${classId}`, {
+        fetch(`/nv/adjust_class/get_hocSinh?student_id=${studentId}&class_id=${classId}&si_so=${siSo}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -381,6 +382,11 @@ function AddStudentToTable() {
         .then(data => {
             if ((Array.isArray(data) && data.length === 0)) {
                alert("Lỗi đã có học sinh này trong lớp hoặc nhập sai id!")
+               return
+            }
+            if(data.message)
+            {
+               alert(data.message)
                return
             }
             if (selectedStudents.find(student => student.id === data["id"] && student.id_class === classId)) {
@@ -483,18 +489,45 @@ function limitInput() {
   inputs.forEach(function(input) {
     var value = input.value;
 
-    // Kiểm tra xem giá trị có phải là số và có tối đa 2 chữ số
-    if (/^\d{1,2}$/.test(value)) {
-      // Cắt nếu giá trị vượt quá 10
-      if (value > 10) {
+    // Kiểm tra và giới hạn giá trị hợp lệ từ 0 đến 10 với tối đa 1 chữ số sau dấu chấm
+    if (/^\d{0,2}(\.\d{0,1})?$/.test(value)) {
+      if (parseFloat(value) > 10) {
         input.value = "10";
       }
     } else {
-      // Nếu không phải là số hợp lệ, chỉ giữ lại phần số
-      input.value = value.replace(/[^0-9]/g, '').slice(0, 2);
+      // Nếu không hợp lệ, chỉ giữ lại phần số hợp lệ (bao gồm dấu chấm thập phân)
+      input.value = value
+        .replace(/[^0-9.]/g, '') // Xóa ký tự không phải số hoặc dấu chấm
+        .replace(/(\..*?)\..*/g, '$1') // Chỉ giữ lại 1 dấu chấm
+        .replace(/^0+(\d)/, '$1') // Xóa số 0 ở đầu (nếu có nhiều số 0)
+        .slice(0, 4); // Giới hạn tối đa 4 ký tự (ví dụ: "10.0")
+
+      // Nếu giá trị vượt quá 10, gán lại về 10
+      if (parseFloat(input.value) > 10) {
+        input.value = "10";
+      }
     }
   });
 }
+//function limitInput() {
+//  var inputs = document.querySelectorAll('.scoreInput');
+//
+//  // Duyệt qua từng input
+//  inputs.forEach(function(input) {
+//    var value = input.value;
+//
+//    // Kiểm tra xem giá trị có phải là số và có tối đa 2 chữ số
+//    if (/^\d{1,2}$/.test(value)) {
+//      // Cắt nếu giá trị vượt quá 10
+//      if (value > 10) {
+//        input.value = "10";
+//      }
+//    } else {
+//      // Nếu không phải là số hợp lệ, chỉ giữ lại phần số
+//      input.value = value.replace(/[^0-9]/g, '').slice(0, 2);
+//    }
+//  });
+//}
 
 // Thống kê
 let char=null
@@ -647,7 +680,7 @@ function updateScoreTableUI(data) {
     col_45.setAttribute('colspan', phut_45)
     h = ``
     let count_student = 0
-    let point = `<td class="score"><input type="text" class="scoreInput" oninput="limitInput()"></td>`.repeat(phut_15 + phut_45 + 1)
+    let point = `<td class="score"><input type="number" step="0.01" class="scoreInput" oninput="limitInput()"></td>`.repeat(phut_15 + phut_45 + 1)
     for (count_student = 0; count_student < data.length; count_student++) {
         h += `<tr name="score-${count_student}" value="${data[count_student].student_id}"><td>${count_student + 1}</td><td id="${count_student}">${data[count_student].name}</td>` + point + `</tr>`
     }
@@ -685,7 +718,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if (window.location.pathname === '/gv/nhap_diem') {
     changeClass();
 }
-    if(window.location.pathname=='/gv/xuat_diem'){
+    if(window.location.pathname==='/gv/xuat_diem'){
     thaydoiNamHoc()
     }
 })
@@ -704,7 +737,6 @@ function changeSelectSubject(data) {
 }
 
 function changeClass() {
-console.log("Doi lop")
     select = document.getElementById('class')
     valueOption = select.options[select.selectedIndex].value
     fetch(`/api/gv/get-subject/${valueOption}`, {
@@ -729,38 +761,81 @@ function get_score() {
     phut_15 = document.getElementById('col_15').getAttribute('colspan')
     phut_45 = document.getElementById('col_45').getAttribute('colspan')
     student_row = document.querySelectorAll('#body-table > tr')
+    run = true
     if (student_row.length != 0) {
         student_score = []
         student_row.forEach(item => {
-            console.log(item.getAttribute('value'))
             col = item.querySelectorAll('.score > input')
+            n = col.length
+            for (let i = 0; i < n; i++) {
+                if (col[i].value == "") {
+                    alert("Bạn nhập chưa đủ cột")
+                    run = false
+                    return
+                }
+            }
             col_array = [item.getAttribute('value')]
             col_array.push(Array.from(col).map(col => col.value))
             student_score.push(col_array)
         })
-        fetch(`/api/gv/get-score`, {
-            method: "post",
-            body: JSON.stringify({
-                "class_id": class_id,
-                "subject_id": subject_id,
-                "number_15": phut_15,
-                "number_45": phut_45,
-                "student_score": student_score
-            }),
-            headers: {
-            'Content-Type': 'application/json'
-            }
-        }).then(response => response.json()).then(data => {
-            alert(data['thong_bao'])
-        })
+        if (run) {
+            fetch(`/api/gv/get-score`, {
+                method: "post",
+                body: JSON.stringify({
+                    "class_id": class_id,
+                    "subject_id": subject_id,
+                    "number_15": phut_15,
+                    "number_45": phut_45,
+                    "student_score": student_score
+                }),
+                headers: {
+                'Content-Type': 'application/json'
+                }
+            }).then(response => response.json()).then(data => {
+               if (data) {
+                    alert(data['thong_bao'])
+                }
+            })
+        }
     } else {
         alert("Chưa có học sinh trong bảng. Vui lòng bấm nhập điểm")
     }
 }
 
+function showScore(data) {
+    col_15 = document.getElementById('col_15')
+    col_45 = document.getElementById('col_45')
+    col_15.setAttribute('colspan', 1)
+    col_45.setAttribute('colspan', 1)
+    h = ``
+    let count_student = 0
+    for (count_student = 0; count_student < data.length; count_student++) {
+        let point = `<td class="score">${data[count_student]['score']['test_15'].join('        ')}</td><td class="score">${data[count_student]['score']['test_45'].join('        ')}</td><td class="score">${data[count_student]['score']['test_ck'].join('        ')}</td>`
+        h += `<tr name="score-${count_student}" value="${data[count_student].student_id}"><td>${count_student + 1}</td><td id="${count_student}">${data[count_student].name}</td>` + point + `</tr>`
+    }
+    body_table = document.getElementById('body-table')
+    body_table.innerHTML = h
+}
+
+function xemDiem() {
+    class_id = document.getElementById("class").value
+    subject_id = document.getElementById("subject").value
+    fetch(`/api/gv/nhap_diem/xem_diem?class_id=${class_id}&subject_id=${subject_id}`, {
+        method: "GET"
+    }).then(response => response.json()).then(data => {
+        if (data.length == 0) {
+            alert("Lớp này chưa được nhập điểm")
+        } else {
+            showScore(data)
+        }
+    })
+}
 function thaydoiNamHoc(){
     nameClass=document.getElementById('name_class')
     select_namHoc=document.getElementById('year')
+    if(!select_namHoc){
+    return
+    }
     namHoc=select_namHoc.options[select_namHoc.selectedIndex].value
        fetch(`/gv/xuat_diem/getclass?namHoc=${namHoc}`, {
             method: 'GET',
@@ -774,5 +849,51 @@ function thaydoiNamHoc(){
 
 
 function loadDanhSachDiem(){
+  select_namHoc=document.getElementById('year')
+  namHoc=select_namHoc.options[select_namHoc.selectedIndex].value
+  tenLop=document.getElementById('name_class').value
+  fetch(`/api/gv/xuat_diem`, {
+                method: "post",
+                body: JSON.stringify({
+                    "ten_lop": tenLop,
+                    "nam_hoc": namHoc
+                }),
+                headers: {
+                'Content-Type': 'application/json'
+                }
+            }).then(response => response.json()).then(data => {
+               if ((Array.isArray(data) && data.length === 0)) {
+                        alert("Không có dữ liệu!")
+                }
+
+                 count=0
+                danhSachHocSinh.innerHTML=''
+                for (id_hoc_sinh in data){
+                const hoc_sinh=data[id_hoc_sinh]
+                const tr = document.createElement('tr');
+                const tdSTT = document.createElement('td');
+                const tdHoTen = document.createElement('td');
+                const tdLop = document.createElement('td');
+                const tdTBHK1 = document.createElement('td');
+                const tdTBHK2=document.createElement('td');
+
+                tdSTT.textContent=++count;
+                tdHoTen.textContent=hoc_sinh['ten_hoc_sinh']
+                tdLop.textContent=hoc_sinh['ten_lop']
+                tdTBHK1.textContent=hoc_sinh['tb_hk1']
+                tdTBHK2.textContent=hoc_sinh['tb_hk2']
+
+                tr.appendChild(tdSTT)
+                tr.appendChild(tdHoTen)
+                tr.appendChild(tdLop)
+                tr.appendChild(tdTBHK1)
+                tr.appendChild(tdTBHK2)
+
+                danhSachHocSinh=document.getElementById('danhSachHocSinh')
+                danhSachHocSinh.appendChild(tr)
+            }
+            }).catch(error => {
+        console.error('Error:', error);
+    });
 
 }

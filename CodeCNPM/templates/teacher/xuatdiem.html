@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="main-container">
+    {% if list_namhoc %}
     <form method="post">
         <div class="thems-text">Nhập thông tin</div>
-
         <div class="content-block flex">
             <div class="content flex">
                 <label for="year">Chọn năm học:</label>
@@ -17,7 +17,7 @@
              <div class="content flex">
                 <label >Chọn lớp:</label>
                 <input type="text" readonly value="" id="name_class"/>
-            </div>
+             </div>
         </div>
 
         <button type="button" class="button left" onclick="loadDanhSachDiem()">Xem điểm</button>
@@ -34,20 +34,13 @@
                 <th>Điểm TB HK2</th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td>1</td>
-                <td>Nguyễn Văn A</td>
+            <tbody id="danhSachHocSinh">
 
-                <td class="score"></td>
-                 <!--                Cột TBKH1-->
-                <td class="score"></td>
-                 <!--                Cột TBKH2-->
-                <td class="score"></td>
-            </tr>
             </tbody>
         </table>
     </div>
-
+    {% else %}
+    <h1 style="color:red;text-align:center; margin-top:5rem;">Không có quyền truy cập</h1>
+    {% endif %}
 </div>
 {% endblock %}

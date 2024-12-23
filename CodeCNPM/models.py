@@ -1,5 +1,7 @@
 from turtledemo.penrose import start
 
+from sqlalchemy.dialects.mysql import DECIMAL
+
 from init import db, app
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, String, Boolean, Date, Integer, DateTime, ForeignKey, Double, Enum
@@ -131,6 +133,7 @@ class LoaiDiem(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     loai_diem = Column(String(45), nullable=False)
     he_so = Column(Integer, nullable=False)
+    diem = relationship('Diem', backref="loai_diem", lazy=True)
 
 
 class MonHoc(db.Model):
