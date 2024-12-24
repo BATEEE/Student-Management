@@ -1,5 +1,17 @@
 {% extends 'layout/employee_config/base_ems.html' %}
 
 {% block content %}
-
+<div class="p-container">
+    <div class="thems-text">THÔNG TIN CÁ NHÂN:</div>
+    <div class="info flex">
+        <div class="p-info">
+            <div class="p-content"><span>ID:</span>{{nv.id}}</div>
+            <div class="p-content"><span>Tên:</span>{{nv.ho + " " + nv.ten}}</div>
+            <div class="p-content"><span>Số điện thoại:</span>{{nv.so_dien_thoai}}</div>
+            <div class="p-content"><span>Địa chỉ:</span>{{nv.dia_chi}}</div>
+            <div class="p-content"><span>Email:</span>{{nv.email}}</div>
+            <div class="p-content"><span>Giới tính:</span>{{"Nữ" if nv.gioi_tinh else "Nam"}}</div>
+        </div>
+    </div>
+</div>
 {% endblock %}

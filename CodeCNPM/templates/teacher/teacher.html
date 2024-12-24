@@ -1,5 +1,17 @@
 {% extends 'layout/teacher_config/base_teacher.html' %}
 
 {% block content %}
-DAY LA TRANG CUA GIAO VIEN
+<div class="p-container">
+    <div class="thems-text">THÔNG TIN CÁ NHÂN:</div>
+    <div class="info flex">
+        <div class="p-info">
+            <div class="p-content"><span>ID:</span>{{gv.id}}</div>
+            <div class="p-content"><span>Tên:</span>{{gv.ho + " " + gv.ten}}</div>
+            <div class="p-content"><span>Số điện thoại:</span>{{gv.so_dien_thoai}}</div>
+            <div class="p-content"><span>Địa chỉ:</span>{{gv.dia_chi}}</div>
+            <div class="p-content"><span>Email:</span>{{gv.email}}</div>
+            <div class="p-content"><span>Giới tính:</span>{{"Nữ" if gv.gioi_tinh else "Nam"}}</div>
+        </div>
+    </div>
+</div>
 {% endblock %}

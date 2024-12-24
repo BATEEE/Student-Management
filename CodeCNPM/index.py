@@ -3,7 +3,7 @@ from flask import request, redirect, render_template, session, abort, jsonify
 from functools import wraps
 import dao
 from flask_login import login_user, current_user
-from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NamHocHienTai
+from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NhanVien, GiaoVien, NamHocHienTai
 from models import HocSinh, ThongTinNamHoc, Lop
 from init import app, login, db
 from flask_login import login_user, current_user, login_required, logout_user
@@ -69,7 +69,8 @@ def subject():
 @role_required(['nv'])
 @login_required
 def employee():
-    return render_template('ems/employee.html')
+    nv = NhanVien.query.filter(NhanVien.tai_khoan_id.__eq__(current_user.id)).first()
+    return render_template('ems/employee.html', nv=nv)
 
 
 @app.route('/nv/add', methods=['get', 'post'])
@@ -97,7 +98,6 @@ def add_student_process():
             msg = "Số tuổi yêu cầu từ 15 đến 20"
 
     count = str(HocSinh.query.count() + 1)
-    print(msg)
     return render_template("ems/add_student.html", theme_name=theme_name,
                            count=count, len_of_count=len(count), msg=msg)
 
@@ -292,7 +292,8 @@ def dieuChinhLop_getHocSinh():
 @role_required(['gv'])
 @login_required
 def teacher():
-    return render_template('teacher/teacher.html')
+    gv = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
+    return render_template('teacher/teacher.html', gv=gv)
 
 
 @app.route('/gv/nhap_diem')
@@ -301,9 +302,8 @@ def teacher():
 def nhap_diem():
     theme_name = "Nhập điểm"
     list_class = dao.get_list_class_of_teacher()
-    ttnh = ThongTinNamHoc.query.filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC)).all()
     return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class
-                           , hoc_ki=ttnh, nam_hoc=NamHocHienTai.NAM_HOC)
+                           , hoc_ki=NamHocHienTai.HOC_KY, nam_hoc=NamHocHienTai.NAM_HOC)
 
 @app.route("/api/gv/get-subject/<class_id>", methods=['post'])
 def get_class(class_id):

@@ -37,6 +37,7 @@ class TaiKhoan(db.Model, UserMixin):
     #     'polymorphic_on': Id,
     #     'with_polymorphic': "*"
     # }
+
     giao_vien = relationship('GiaoVien', backref="tai_khoan", lazy=True)
     nhan_vien = relationship('NhanVien', backref="tai_khoan", lazy=True)
     quan_tri = relationship('QuanTri', backref="tai_khoan", lazy=True)
