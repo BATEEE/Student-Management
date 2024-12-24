@@ -67,7 +67,7 @@ def subject():
 @role_required(['nv'])
 @login_required
 def employee():
-    nv = NhanVien.query.filter(current_user.id.__eq__(NhanVien.tai_khoan_id))
+    nv = current_user.nhan_vien
     return render_template('ems/employee.html', nv=nv)
 
 

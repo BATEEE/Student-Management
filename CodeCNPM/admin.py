@@ -111,6 +111,14 @@ class GiaoVienModelView(AuthenticatedView):
     }
 
 
+class GiaoVienDayMonView(AuthenticatedView):
+    can_create = True
+    can_edit = True
+    can_delete = True
+    column_list = ['id', 'mon_hoc_id', 'giao_vien_id']
+    form_columns = ['mon_hoc_id', 'giao_vien_id']
+
+
 class MyView(BaseView):
     def is_accessible(self):
         return current_user.is_authenticated
@@ -165,6 +173,7 @@ admin.add_view(GiaoVienModelView(GiaoVien, db.session,name='Giáo viên'))
 admin.add_view(LopModelView(Lop, db.session,name='Lớp'))
 admin.add_view(QuyDinhView(name="Quy định",endpoint='quydinh'))
 admin.add_view(StatsView(name='Thống kê - Báo cáo'))
+admin.add_view(GiaoVienDayMonView(GiaoVienDayMon,db.session,name='Giáo viên dạy môn'))
 admin.add_view(LogoutView(name='Đăng xuất'))
 
 

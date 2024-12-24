@@ -71,6 +71,7 @@ class GiaoVien(db.Model):
     ngay_sinh = Column(Date)
     so_dien_thoai = Column(String(10))
     tai_khoan_id = Column(Integer, ForeignKey('tai_khoan.id'), unique=True)
+
     def __str__(self):
         return self.ho+" "+self.ten
     # def __init__(self, id, ho, ten, gioi_tinh, dia_chi, email, ngay_sinh, so_dien_thoai):
@@ -141,7 +142,6 @@ class MonHoc(db.Model):
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     ten_mon_hoc = Column(String(50), nullable=False)
     hoc_sinh_hoc_mon = relationship('HocSinhHocMon', backref="mon_hoc", lazy=True)
-    giao_vien_day_mon = relationship('GiaoVienDayMon', backref="mon_hoc", lazy=True)
 
     def __str__(self):
         return self.ten_mon_hoc
@@ -201,6 +201,8 @@ class GiaoVienDayMon(db.Model):
     mon_hoc_id = Column(Integer, ForeignKey('mon_hoc.id'), nullable=False)
     giao_vien_id = Column(Integer, ForeignKey('giao_vien.id'), nullable=False)
     day = relationship('Day', backref="giao_vien_day_mon", lazy=True)
+    giao_vien = relationship('GiaoVien', backref="giao_vien_day_mon", lazy=True)
+    mon_hoc = relationship('MonHoc', backref="giao_vien_day_mon", lazy=True)
 
 
 class QuyDinh:
@@ -278,19 +280,19 @@ if __name__ == '__main__':
         db.session.add_all([hs_1, hs_2])
 
         # Thêm dữ liệu vào bảng Học sinh học môn
-        # hshm_1 = HocSinhHocMon(mon_hoc_id=1, hoc_sinh_id="HS001", thong_tin_nam_hoc_id=1)
-        # hshm_2 = HocSinhHocMon(mon_hoc_id=2, hoc_sinh_id="HS002", thong_tin_nam_hoc_id=2)
-        # db.session.add_all([hshm_1, hshm_2])
+        hshm_1 = HocSinhHocMon(mon_hoc_id=1, hoc_sinh_id="HS001", thong_tin_nam_hoc_id=1)
+        hshm_2 = HocSinhHocMon(mon_hoc_id=2, hoc_sinh_id="HS002", thong_tin_nam_hoc_id=2)
+        db.session.add_all([hshm_1, hshm_2])
 
         # Thêm dữ liệu vào bảng Giao viên dạy môn
-        # gv_dm_1 = GiaoVienDayMon(mon_hoc_id=1, giao_vien_id=1)
-        # gv_dm_2 = GiaoVienDayMon(mon_hoc_id=2, giao_vien_id=2)
-        # db.session.add_all([gv_dm_1, gv_dm_2])
+        gv_dm_1 = GiaoVienDayMon(mon_hoc_id=1, giao_vien_id=1)
+        gv_dm_2 = GiaoVienDayMon(mon_hoc_id=2, giao_vien_id=2)
+        db.session.add_all([gv_dm_1, gv_dm_2])
 
         # Thêm dữ liệu vào bảng Điểm
-        # diem_1 = Diem(so_diem=8.5, loai_diem_id=1, hoc_sinh_hoc_mon_id=1)
-        # diem_2 = Diem(so_diem=9.0, loai_diem_id=3, hoc_sinh_hoc_mon_id=2)
-        # db.session.add_all([diem_1, diem_2])
+        diem_1 = Diem(so_diem=8.5, loai_diem_id=1, hoc_sinh_hoc_mon_id=1)
+        diem_2 = Diem(so_diem=9.0, loai_diem_id=3, hoc_sinh_hoc_mon_id=2)
+        db.session.add_all([diem_1, diem_2])
 
         # Lưu thay đổi
         db.session.commit()
