@@ -1,24 +1,21 @@
 import datetime
 from flask import request, redirect, render_template, session, abort, jsonify
 from functools import wraps
-
-from sqlalchemy.dialects.mssql.json import JSONIndexType
-
 import dao
 from flask_login import login_user, current_user
-from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NamHocHienTai
+from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NhanVien, GiaoVien
 from models import HocSinh, ThongTinNamHoc, Lop
 from init import app, login, db
 from flask_login import login_user, current_user, login_required, logout_user
 from models import HocSinh
 
 
-# @app.route("/")
-# def index():
-#     if not current_user.is_authenticated:
-#         return redirect('/login')
-#     else:
-#         return render_template("index.html")
+@app.route("/")
+def index():
+    if not current_user.is_authenticated:
+        return redirect('/login')
+    else:
+        return render_template("index.html")
 
 
 def role_required(allowed_roles):
@@ -48,8 +45,6 @@ def login_user_process():
             session['role'] = direct
             if direct.__eq__('qt'):
                 direct = 'admin'
-            elif direct.__eq__('gv'):
-                direct = ''
             return redirect('/' + direct)
         else:
             err_msg = "Tài khoản hoặc mật khẩu của bạn không chính xác"
@@ -72,7 +67,8 @@ def subject():
 @role_required(['nv'])
 @login_required
 def employee():
-    return render_template('ems/employee.html')
+    nv = NhanVien.query.filter(current_user.id.__eq__(NhanVien.tai_khoan_id))
+    return render_template('ems/employee.html', nv=nv)
 
 
 @app.route('/nv/add', methods=['get', 'post'])
@@ -92,7 +88,7 @@ def add_student_process():
         address = request.form.get('address')
         contact = request.form.get('contact')
         email = request.form.get('email')
-        if datetime.datetime.now().year - int(date[:4]) >= QuyDinh.AGE_MIN and datetime.datetime.now().year - int(date[:4]) <= QuyDinh.AGE_MAX:
+        if datetime.datetime.now().year - int(date[:4]) >= 15 and datetime.datetime.now().year - int(date[:4]) <= 20:
             dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email,
                         ngay_sinh=date, so_dien_thoai=contact)
             msg = "Thêm thành công"
@@ -100,7 +96,6 @@ def add_student_process():
             msg = "Số tuổi yêu cầu từ 15 đến 20"
 
     count = str(HocSinh.query.count() + 1)
-    print(msg)
     return render_template("ems/add_student.html", theme_name=theme_name,
                            count=count, len_of_count=len(count), msg=msg)
 
@@ -196,7 +191,7 @@ def create_class():
             list_student_js.append(student)
         session['list_student'] = list_student_js
         return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=int(session['class_id']),
-                               list_student=list_student_js, nam_hoc=NamHocHienTai.NAM_HOC, hoc_ky=str(NamHocHienTai.HOC_KY))
+                               list_student=list_student_js)
     elif request.method.__eq__('POST'):
         list_student = session['list_student']
         dao.add_student_into_class(list_student=list_student, class_id=session['class_id'])
@@ -204,9 +199,9 @@ def create_class():
         list_student = session['list_student']
         return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class,
                                selected_id=int(session['class_id']), list_student=list_student
-                               , number_of_class=session['number_of_class'], nam_hoc=NamHocHienTai.NAM_HOC, hoc_ky=str(NamHocHienTai.HOC_KY))
+                               , number_of_class=session['number_of_class'])
     return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=1, list_student=[]
-                         , number_of_class=0, nam_hoc=NamHocHienTai.NAM_HOC, hoc_ky=str(NamHocHienTai.HOC_KY))
+                         , number_of_class=0)
 
 
 @app.route("/api/create_class/<hoc_sinh_id>", methods=['delete'])
@@ -219,14 +214,6 @@ def delete_student(hoc_sinh_id):
             return jsonify({"success": True, "message": "Học sinh đã được xóa"})
     return jsonify({"success": False, "message": "Học sinh không tồn tại"})
 
-#Xoa hoc sinh khoi lop
-@app.route("/api/adjust_class/<hoc_sinh_id>&<class_id>", methods=['delete'])
-def delete_student_class(hoc_sinh_id,class_id):
-    if dao.delete_hocsinh(idHocSinh=hoc_sinh_id,idLop=class_id):
-         db.session.commit()
-         return jsonify({"success":True, "message": "Xóa học sinh thành công!"})
-    return jsonify({"success": False, "message": "Xóa học sinh không thành công!"})
-
 #Dieu chinh lop
 @app.route('/nv/adjust_class')
 @role_required(['nv'])
@@ -236,7 +223,6 @@ def adjust_class():
     danhsachlop=dao.get_hocsinh_lop()
     return render_template('ems/adjust_class.html', theme_name=theme_name,danhsachlop=danhsachlop,quydinh=QuyDinh)
 
-#Lay danh sach hoc sinh theo lop
 @app.route('/nv/adjust_class/get_listStudent',methods=['GET'])
 def get_hocSinhTheoLop():
     idLop=request.args.get('id_lop')
@@ -251,6 +237,7 @@ def get_hocSinhTheoLop():
     } for student in result]
     return jsonify(listStudent)
 
+<<<<<<< HEAD
 #Them hoc sinh moi khi dieu chinh lop
 @app.route('/nv/adjust_class',methods=['POST'])
 @role_required(['nv'])
@@ -294,13 +281,16 @@ def dieuChinhLop_getHocSinh():
         }
         return jsonify(student)
     return jsonify([])
+=======
+>>>>>>> 91864ec405dc53e4dca8c3b8d97fa375cb41b314
 
 #Trang Giao Vien
-@app.route('/')
+@app.route('/gv')
 @role_required(['gv'])
 @login_required
 def teacher():
-    return render_template('teacher/teacher.html')
+    gv = GiaoVien.query.filter(current_user.id.__eq__(GiaoVien.tai_khoan_id))
+    return render_template('teacher/teacher.html', gv=gv)
 
 
 @app.route('/gv/nhap_diem')
@@ -308,67 +298,8 @@ def teacher():
 @login_required
 def nhap_diem():
     theme_name = "Nhập điểm"
-    list_class = dao.get_list_class_of_teacher()
-    return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class
-                           , hoc_ki=NamHocHienTai.HOC_KY, nam_hoc=NamHocHienTai.NAM_HOC)
+    return render_template('teacher/nhapdiem.html', theme_name=theme_name)
 
-@app.route("/api/gv/get-subject/<class_id>", methods=['post'])
-def get_class(class_id):
-    data = request.get_json()
-    list_subject = dao.get_subject_of_teacher_in_class(data['class_id'])
-    subject_json = []
-    for subject in list_subject:
-        json = {
-            "id": subject.giao_vien_day_mon.mon_hoc.id,
-            "ten_mon_hoc": subject.giao_vien_day_mon.mon_hoc.ten_mon_hoc
-        }
-        subject_json.append(json)
-    return jsonify(subject_json)
-
-@app.route('/api/gv/nhap_diem', methods=['post'])
-def get_list_student():
-    data = request.get_json()
-    list_student = dao.get_listHocSinh_lop(data['class_id'])
-    list_student_json = []
-    for student in list_student:
-        list_student_json.append({
-            "student_id": student.id,
-            "name": student.ho + " " + student.ten
-        })
-    return jsonify(list_student_json)
-
-@app.route('/api/gv/get-score', methods=['post'])
-def get_score():
-    data = request.get_json()
-    phut_15 = int(data['number_15'])
-    phut_45 = int(data['number_45'])
-    trang_thai = {}
-    for score in data['student_score']:
-        trang_thai = dao.save_score(student_id=score[0], subject_id=data['subject_id'],
-                       score_15=score[1][:phut_15]
-                       , score_45=score[1][phut_15:phut_15 + phut_45], score_cuoi_ky=[score[1][-1]])
-        if trang_thai['success'].__eq__("fail"):
-            break
-    return jsonify(trang_thai)
-
-@app.route("/api/gv/nhap_diem/xem_diem", methods=['get'])
-def xem_diem():
-    class_id = request.args.get("class_id")
-    subject_id = request.args.get("subject_id")
-    list_student = dao.get_listHocSinh_lop(class_id)
-    score_all_student = []
-    for student in list_student:
-        score_of_student = dao.get_score(subject_id, student)
-        score_js = {
-            "name": student.ho + " " + student.ten,
-            "score": {
-                "test_15": score_of_student[0],
-                "test_45": score_of_student[1],
-                "test_ck": score_of_student[2]
-            }
-        }
-        score_all_student.append(score_js)
-    return jsonify(score_all_student)
 
 @app.route('/gv/xuat_diem')
 @role_required(['gv'])
