@@ -109,6 +109,7 @@ def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
     student = dao.find_student(id)
+
     return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 
@@ -270,7 +271,7 @@ def dieuChinhLop_getHocSinh():
     list_student_class = dao.get_listHocSinh_lop(class_id)
     kiemtrahocsinhcolop=dao.kiemtra_hocsinh_lop(student_id)
 
-    if siSo>=QuyDinh.SI_SO:
+    if int(siSo)>=QuyDinh.SI_SO:
         mess = "Quá số lượng học sinh quy định."
         return jsonify({'message': mess})
     if kiemtrahocsinhcolop:
@@ -461,4 +462,4 @@ def get_thongke():
 if __name__ == '__main__':
     with app.app_context():
         from admin import admin
-        app.run(debug=True, host="26.7.192.47", port=2004)
+        app.run(debug=True,host="26.72.59.33", port=2004)

@@ -244,9 +244,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 //Xóa học sinh khỏi lớp UI
 function delete_hocSinhUI(id,class_id){
-
      if(selectedStudents.find(student => student.id === id && student.id_class === class_id))
-        selectedStudents=selectedStudents.filter(student=> student.id!==id && student.id_class!==class_id)
+        {selectedStudents=selectedStudents.filter(student=> !(student.id===id && student.id_class===class_id))}
      if (confirm("Bạn chắc chắn xóa không?") === true) {
         fetch(`/api/adjust_class/${id}&${class_id}`, {
             method: "delete"
@@ -367,7 +366,7 @@ function updateAdjustTable(){
 function AddStudentToTable() {
     var studentId = document.getElementById('student_id').value;
     var selectElement=document.getElementById('class');
-    var siSo=document.getElementById('siso')
+    var siSo=document.getElementById('siso').value
     if(selectElement.selectedIndex===-1)
     return
     var classId = selectElement.options[selectElement.selectedIndex].id;
@@ -862,8 +861,17 @@ function loadDanhSachDiem(){
                 tdSTT.textContent=++count;
                 tdHoTen.textContent=hoc_sinh['ten_hoc_sinh']
                 tdLop.textContent=hoc_sinh['ten_lop']
-                tdTBHK1.textContent=hoc_sinh['tb_hk1']
-                tdTBHK2.textContent=hoc_sinh['tb_hk2']
+                hk1=parseFloat(hoc_sinh['tb_hk1'])
+                hk2=parseFloat(hoc_sinh['tb_hk2'])
+
+                tdTBHK1.textContent=''
+                if(hk1)
+                 tdTBHK1.textContent=hk1.toFixed(2)
+
+                tdTBHK2.textContent=''
+                if(hk2)
+                tdTBHK2.textContent=hk2.toFixed(2)
+
 
                 tr.appendChild(tdSTT)
                 tr.appendChild(tdHoTen)

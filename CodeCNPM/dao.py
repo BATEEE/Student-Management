@@ -47,11 +47,20 @@ def find_student_class(id):
         .first()
     return student_class
 
+def find_student_class2(id):
+    student_class = HocSinhThuocLop.query \
+        .join(HocSinhThuocLop.thong_tin_nam_hoc) \
+        .filter(HocSinhThuocLop.hoc_sinh_id == id, ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)) \
+        .first()
+    return student_class
+
 def find_student(id):
     if not id:
         return []
     student = HocSinh.query.filter(HocSinh.id.__eq__(id)).first()
-    student_class = find_student_class(student.id)
+    if not student:
+        return []
+    student_class = find_student_class2(student.id)
     if student_class:
         return {
             "id": student_class.hoc_sinh.id,
@@ -94,6 +103,14 @@ def create_class(number_of_class, class_id):
     lop = Lop.query.filter(Lop.id.__eq__(class_id)).first()
     # Lấy thông tin năm học của kỳ trước ví dụ học kỳ 2 thì xuống học kỳ 1 còn năm thì giảm nếu học kỳ là 1 còn nếu học kỳ là 2 thì sẽ giữ nguyên
     nam_hoc, hoc_ky, khoi_lop = (int(NamHocHienTai.NAM_HOC), 1, lop.khoi_lop) if NamHocHienTai.HOC_KY.__eq__(2) else (int(NamHocHienTai.NAM_HOC) - 1, 2, lop.khoi_lop - 1)
+    if khoi_lop.__eq__(9):
+        student_of_class = (HocSinhThuocLop.query.join(HocSinhThuocLop.thong_tin_nam_hoc)
+                            .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC),
+                                    ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).all())
+        new_students = [x.hoc_sinh_id for x in student_of_class]
+        random_student = HocSinh.query.filter(HocSinh.id.notin_(new_students)).order_by(func.random()).limit(
+            number_of_class).all()
+        return random_student
     # Lấy danh sách học sinh đã học ở kỳ trước tương đương khối lớp đã học ở kỳ trước
     student_last_year = db.session.query(HocSinh).join(HocSinhThuocLop, HocSinhThuocLop.hoc_sinh_id.__eq__(HocSinh.id)) \
                         .join(ThongTinNamHoc, HocSinhThuocLop.thong_tin_nam_hoc_id.__eq__(ThongTinNamHoc.id)) \
