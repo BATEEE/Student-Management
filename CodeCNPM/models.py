@@ -238,11 +238,10 @@ if __name__ == '__main__':
         db.session.add_all([mon_toan, mon_ly, mon_hoa])
 
         # Thêm dữ liệu vào bảng Loại điểm
-        loai_diem_1 = LoaiDiem(loai_diem="Kiểm tra miệng", he_so=1)
-        loai_diem_2 = LoaiDiem(loai_diem="Kiểm tra 15 phút", he_so=1)
-        loai_diem_3 = LoaiDiem(loai_diem="Kiểm tra 1 tiết", he_so=2)
-        loai_diem_4 = LoaiDiem(loai_diem="Điểm thi", he_so=3)
-        db.session.add_all([loai_diem_1, loai_diem_2, loai_diem_3, loai_diem_4])
+        loai_diem_2 = LoaiDiem(loai_diem="15p", he_so=1)
+        loai_diem_3 = LoaiDiem(loai_diem="45p", he_so=2)
+        loai_diem_4 = LoaiDiem(loai_diem="ck", he_so=3)
+        db.session.add_all([loai_diem_2, loai_diem_3, loai_diem_4])
 
         # Thêm dữ liệu vào bảng Giáo viên
         gv_1 = GiaoVien(

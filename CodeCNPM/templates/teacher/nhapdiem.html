@@ -24,8 +24,10 @@
         <div class="content-block flex">
             <div class="content flex">
                 <label for="semester">Chọn học kì:</label>
-                <select name="semester" id="semester" disabled>
-                    <option name="" value="">{{hoc_ki}}</option>
+                <select name="semester" id="semester" >
+                    {% for item in hoc_ki %}
+                    <option name="" value="">{{item.hoc_ki}}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="content flex">

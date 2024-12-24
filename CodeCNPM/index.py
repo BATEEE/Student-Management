@@ -1,9 +1,6 @@
 import datetime
 from flask import request, redirect, render_template, session, abort, jsonify
 from functools import wraps
-
-from sqlalchemy.dialects.mssql.json import JSONIndexType
-
 import dao
 from flask_login import login_user, current_user
 from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NamHocHienTai
@@ -304,8 +301,9 @@ def teacher():
 def nhap_diem():
     theme_name = "Nhập điểm"
     list_class = dao.get_list_class_of_teacher()
+    ttnh = ThongTinNamHoc.query.filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC)).all()
     return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class
-                           , hoc_ki=NamHocHienTai.HOC_KY, nam_hoc=NamHocHienTai.NAM_HOC)
+                           , hoc_ki=ttnh, nam_hoc=NamHocHienTai.NAM_HOC)
 
 @app.route("/api/gv/get-subject/<class_id>", methods=['post'])
 def get_class(class_id):
