@@ -231,7 +231,7 @@ def delete_student_class(hoc_sinh_id,class_id):
 def adjust_class():
     theme_name = "Điều chỉnh danh sách lớp"
     danhsachlop=dao.get_hocsinh_lop()
-    return render_template('ems/adjust_class.html', theme_name=theme_name,danhsachlop=danhsachlop)
+    return render_template('ems/adjust_class.html', theme_name=theme_name,danhsachlop=danhsachlop,quydinh=QuyDinh)
 
 #Lay danh sach hoc sinh theo lop
 @app.route('/nv/adjust_class/get_listStudent',methods=['GET'])
@@ -266,8 +266,13 @@ def dieuChinhLop_themHocSinh():
 def dieuChinhLop_getHocSinh():
     student_id=request.args.get('student_id')
     class_id=request.args.get('class_id')
+    siSo=request.args.get('si_so')
     list_student_class = dao.get_listHocSinh_lop(class_id)
     kiemtrahocsinhcolop=dao.kiemtra_hocsinh_lop(student_id)
+
+    if siSo>=QuyDinh.SI_SO:
+        mess = "Quá số lượng học sinh quy định."
+        return jsonify({'message': mess})
     if kiemtrahocsinhcolop:
         return jsonify([])
     for item in list_student_class:
@@ -286,6 +291,7 @@ def dieuChinhLop_getHocSinh():
         }
         return jsonify(student)
     return jsonify([])
+
 
 #Trang Giao Vien
 @app.route('/')
@@ -368,7 +374,9 @@ def xem_diem():
 @login_required
 def xuat_diem():
     theme_name = "Xuất điểm"
-    return render_template('teacher/xuatdiem.html', theme_name=theme_name)
+    list_class = dao.get_list_class_of_teacher()
+    list_namhoc=dao.get_namhoc_giaovienday()
+    return render_template('teacher/xuatdiem.html', theme_name=theme_name,list_class=list_class,list_namhoc=list_namhoc)
 
 
 @login.user_loader
@@ -393,7 +401,47 @@ def log_out():
     return redirect('login')
 
 
-#
+#lay lop theo nam hoc
+@app.route('/gv/xuat_diem/getclass', methods=['GET'])
+def get_lopTheoNamHoc():
+    nam_hoc = request.args.get('namHoc')
+    result=dao.get_lop_namhoc(nam_hoc)
+    name_class={
+        "id": result.lop.id,
+        "ten_lop":result.lop.ten_lop
+    }
+    return jsonify(name_class)
+#Lay hoc sinh bao cao diem
+@app.route('/api/gv/xuat_diem', methods=['POST'])
+def get_hocSinhBaoCaoDiem():
+    data= request.get_json()
+    result=dao.get_diemTB_hocKi(tenlop=data['ten_lop'],namhoc=data['nam_hoc'])
+    if not result:
+        return jsonify([])
+    list_students={}
+    for item in result:
+        if item[0] not in list_students:
+            list_students[item[0]] = {
+                'ten_hoc_sinh': item[1],
+                'ten_lop': item[2],
+                'tb_hk1': None,
+                'tb_hk2': None
+            }
+        if item[3] == 1:
+            list_students[item[0]]['tb_hk1'] = item[4]
+        elif item[3] == 2:
+            list_students[item[0]]['tb_hk2'] = item[4]
+    # list_students = [
+    #     {
+    #         'ten_hoc_sinh': student_data['ten_hoc_sinh'],
+    #         'ten_lop': student_data['ten_lop'],
+    #         'tb_hk1': student_data['tb_hk1'],
+    #         'tb_hk2': student_data['tb_hk2']
+    #     }
+    #     for student_data in result.values()
+    # ]
+    return jsonify(list_students)
+
 @app.route('/admin/get_thongke', methods=['GET'])
 def get_thongke():
     nam_hoc = request.args.get('nam_hoc')

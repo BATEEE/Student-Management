@@ -223,6 +223,7 @@ def save_score(student_id, subject_id, score_15, score_45, score_cuoi_ky):
                                                                        HocSinhHocMon.hoc_sinh_id.__eq__(hshm.hoc_sinh_id),
                                                                        HocSinhHocMon.thong_tin_nam_hoc_id.__eq__(hshm.thong_tin_nam_hoc_id)).all()
     if duplicates:
+        print("Lớp này đã lưu điểm")
         return {"success": "fail", "thong_bao": "Lớp này đã được lưu từ trước. Vui lòng chọn lớp khác"}
     db.session.add(hshm)
     db.session.commit()
@@ -242,3 +243,72 @@ def get_score(subject_id, student):
     test_ck = [x.so_diem for x in score_of_student if x.loai_diem.loai_diem.__eq__("ck")]
     return [test_15, test_45, test_ck]
 
+#Lay cac nam hoc da day
+def get_namhoc_giaovienday():
+    user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
+    # return ThongTinNamHoc.session.query().join(Day,Day.thong_tin_nam_hoc_id.__eq__(ThongTinNamHoc.id))
+    #         .join(GiaoVien,GiaoVien.id.__eq__(user.id)).filter(Day.chu_nhiem.__eq__(True))).all()
+    return (db.session.query(Day).join(ThongTinNamHoc,ThongTinNamHoc.id==Day.thong_tin_nam_hoc_id)
+            .join(GiaoVienDayMon,GiaoVienDayMon.id==Day.giao_vien_day_mon_id)
+            .join(GiaoVien,GiaoVienDayMon.giao_vien_id==GiaoVien.id)
+            .filter(GiaoVien.tai_khoan_id.__eq__(user.id),Day.chu_nhiem.__eq__(True))).all()
+
+#Lay lop theo nam hoc
+def get_lop_namhoc(namhoc):
+    user = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
+    return ((db.session.query(Day).join(Lop,Lop.id==Day.lop_id)
+            .join(ThongTinNamHoc,ThongTinNamHoc.id==Day.thong_tin_nam_hoc_id))
+            .join(GiaoVienDayMon,GiaoVienDayMon.id==Day.giao_vien_day_mon_id)
+            .join(GiaoVien,GiaoVienDayMon.giao_vien_id==GiaoVien.id)
+            .filter(ThongTinNamHoc.nam_hoc==namhoc,GiaoVien.tai_khoan_id.__eq__(user.id),Day.chu_nhiem.__eq__(True)).first())
+
+#lay danh sach hoc sinh diem TBHK
+def get_diemTB_hocKi(namhoc=None,tenlop=None):
+    query = ((db.session.query(
+        HocSinh.id.label("id"),
+        (HocSinh.ho+" "+HocSinh.ten).label('ten_hoc_sinh'),
+        Lop.ten_lop.label('ten_lop'),
+        ThongTinNamHoc.hoc_ki.label('hoc_ki')
+        ,(func.sum(Diem.so_diem * LoaiDiem.he_so) / func.sum(LoaiDiem.he_so)).label('diem_trung_binh')))
+                .join(HocSinhThuocLop, HocSinhThuocLop.lop_id == Lop.id)
+                .join(HocSinh, HocSinhThuocLop.hoc_sinh_id == HocSinh.id)
+                .join(HocSinhHocMon, HocSinhHocMon.hoc_sinh_id == HocSinh.id)
+                .join(Diem, Diem.hoc_sinh_hoc_mon_id == HocSinhHocMon.id)
+                .join(LoaiDiem, Diem.loai_diem_id == LoaiDiem.id)
+                .join(MonHoc, HocSinhHocMon.mon_hoc_id == MonHoc.id)
+                .join(ThongTinNamHoc, HocSinhHocMon.thong_tin_nam_hoc_id == ThongTinNamHoc.id)
+                .filter(Lop.ten_lop==tenlop,ThongTinNamHoc.nam_hoc==namhoc))
+    query = query.group_by(Lop.ten_lop, HocSinh.id,ThongTinNamHoc.hoc_ki,ThongTinNamHoc.nam_hoc)
+    return query.all()
+
+
+# SELECT
+#     lop.ten_lop AS ten_lop,
+#     hoc_sinh.ten,
+# --     hoc_sinh.id AS hoc_sinh_id,
+#     thong_tin_nam_hoc.hoc_ki AS hoc_ki,
+#     thong_tin_nam_hoc.nam_hoc AS nam_hoc,
+#     SUM(diem.so_diem * loai_diem.he_so) / SUM(loai_diem.he_so) AS diem_trung_binh
+# FROM
+#     diem
+# JOIN
+#     loai_diem ON diem.loai_diem_id = loai_diem.id
+# JOIN
+#     hoc_sinh_hoc_mon ON diem.hoc_sinh_hoc_mon_id = hoc_sinh_hoc_mon.id
+# JOIN
+#     hoc_sinh ON hoc_sinh_hoc_mon.hoc_sinh_id = hoc_sinh.id
+# JOIN
+#     hoc_sinh_thuoc_lop ON hoc_sinh.id = hoc_sinh_thuoc_lop.hoc_sinh_id
+# JOIN
+#     lop ON hoc_sinh_thuoc_lop.lop_id = lop.id
+# JOIN
+#     mon_hoc ON hoc_sinh_hoc_mon.mon_hoc_id = mon_hoc.id
+# JOIN
+#     thong_tin_nam_hoc ON hoc_sinh_hoc_mon.thong_tin_nam_hoc_id = thong_tin_nam_hoc.id
+#   -- Chỉ tính điểm môn Toán
+# where lop.ten_lop="12A1"
+# GROUP BY
+#     lop.ten_lop,
+#     hoc_sinh.id,
+#     thong_tin_nam_hoc.hoc_ki,
+#     thong_tin_nam_hoc.nam_hoc
