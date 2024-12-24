@@ -45,8 +45,7 @@ def login_user_process():
             session['role'] = direct
             if direct.__eq__('qt'):
                 direct = 'admin'
-            elif direct.__eq__('gv'):
-                direct = ''
+
             return redirect('/' + direct)
         else:
             err_msg = "Tài khoản hoặc mật khẩu của bạn không chính xác"
