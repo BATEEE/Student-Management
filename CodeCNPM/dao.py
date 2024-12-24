@@ -155,7 +155,9 @@ def thongke_DatMon(mon=None,nam=None,hocki=None):
 def get_hocsinh_lop():
       return (db.session.query(Lop.id,Lop.ten_lop,func.count(HocSinhThuocLop.hoc_sinh_id).label('siso'))
             .join(HocSinhThuocLop,Lop.id==HocSinhThuocLop.lop_id)
-            .join(HocSinh,HocSinhThuocLop.hoc_sinh_id==HocSinh.id).group_by(Lop.id,Lop.ten_lop).distinct().all())
+            .join(HocSinh,HocSinhThuocLop.hoc_sinh_id==HocSinh.id)
+              .join(ThongTinNamHoc, HocSinhThuocLop.thong_tin_nam_hoc_id==ThongTinNamHoc.id)
+              .filter(ThongTinNamHoc.nam_hoc.__eq__(NamHocHienTai.NAM_HOC), ThongTinNamHoc.hoc_ki.__eq__(NamHocHienTai.HOC_KY)).group_by(Lop.id,Lop.ten_lop).distinct().all())
 #Lay danh hoc sinh theo lop
 def get_listHocSinh_lop(idlop):
       return ((db.session.query(HocSinh.id,HocSinh.ho,HocSinh.ten,HocSinh.gioi_tinh,HocSinh.ngay_sinh,HocSinh.dia_chi)
