@@ -462,4 +462,4 @@ def get_thongke():
 if __name__ == '__main__':
     with app.app_context():
         from admin import admin
-        app.run(debug=True,host="26.72.59.33", port=2004)
+        app.run(debug=True)
