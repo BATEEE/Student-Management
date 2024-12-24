@@ -244,9 +244,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 //Xóa học sinh khỏi lớp UI
 function delete_hocSinhUI(id,class_id){
-
      if(selectedStudents.find(student => student.id === id && student.id_class === class_id))
-        selectedStudents=selectedStudents.filter(student=> student.id!==id && student.id_class!==class_id)
+        {selectedStudents=selectedStudents.filter(student=> !(student.id===id && student.id_class===class_id))}
      if (confirm("Bạn chắc chắn xóa không?") === true) {
         fetch(`/api/adjust_class/${id}&${class_id}`, {
             method: "delete"
@@ -367,11 +366,12 @@ function updateAdjustTable(){
 function AddStudentToTable() {
     var studentId = document.getElementById('student_id').value;
     var selectElement=document.getElementById('class');
+    var siSo=document.getElementById('siso').value
     if(selectElement.selectedIndex===-1)
     return
     var classId = selectElement.options[selectElement.selectedIndex].id;
     if (studentId && classId) {
-        fetch(`/nv/adjust_class/get_hocSinh?student_id=${studentId}&class_id=${classId}`, {
+        fetch(`/nv/adjust_class/get_hocSinh?student_id=${studentId}&class_id=${classId}&si_so=${siSo}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -381,6 +381,11 @@ function AddStudentToTable() {
         .then(data => {
             if ((Array.isArray(data) && data.length === 0)) {
                alert("Lỗi đã có học sinh này trong lớp hoặc nhập sai id!")
+               return
+            }
+            if(data.message)
+            {
+               alert(data.message)
                return
             }
             if (selectedStudents.find(student => student.id === data["id"] && student.id_class === classId)) {
@@ -479,6 +484,7 @@ function AddStudentList() {
 function limitInput() {
   var inputs = document.querySelectorAll('.scoreInput');
 
+  // Duyệt qua từng input
   inputs.forEach(function(input) {
     var value = input.value;
 
@@ -691,13 +697,19 @@ function generateTable() {
 
 document.addEventListener('DOMContentLoaded',()=>{
     if (window.location.pathname === '/gv/nhap_diem') {
-
     changeClass();
 }
+    if(window.location.pathname==='/gv/xuat_diem'){
+    thaydoiNamHoc()
+    }
 })
 
 function changeSelectSubject(data) {
     selected_subject = document.getElementById('subject')
+   if(!selected_subject)
+   {
+   return
+   }
     h = ``
     data.forEach(item => {
         h += `<option name="" value="${item.id}" >${item.ten_mon_hoc}</option>`
@@ -799,4 +811,79 @@ function xemDiem() {
         }
     })
 }
+function thaydoiNamHoc(){
+    nameClass=document.getElementById('name_class')
+    select_namHoc=document.getElementById('year')
+    if(!select_namHoc){
+    return
+    }
+    namHoc=select_namHoc.options[select_namHoc.selectedIndex].value
+       fetch(`/gv/xuat_diem/getclass?namHoc=${namHoc}`, {
+            method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+        }).then(response => response.json()).then(data => {
+             nameClass.value=data["ten_lop"]
+        })
+}
 
+
+function loadDanhSachDiem(){
+  select_namHoc=document.getElementById('year')
+  namHoc=select_namHoc.options[select_namHoc.selectedIndex].value
+  tenLop=document.getElementById('name_class').value
+  fetch(`/api/gv/xuat_diem`, {
+                method: "post",
+                body: JSON.stringify({
+                    "ten_lop": tenLop,
+                    "nam_hoc": namHoc
+                }),
+                headers: {
+                'Content-Type': 'application/json'
+                }
+            }).then(response => response.json()).then(data => {
+               if ((Array.isArray(data) && data.length === 0)) {
+                        alert("Không có dữ liệu!")
+                }
+
+                 count=0
+                danhSachHocSinh.innerHTML=''
+                for (id_hoc_sinh in data){
+                const hoc_sinh=data[id_hoc_sinh]
+                const tr = document.createElement('tr');
+                const tdSTT = document.createElement('td');
+                const tdHoTen = document.createElement('td');
+                const tdLop = document.createElement('td');
+                const tdTBHK1 = document.createElement('td');
+                const tdTBHK2=document.createElement('td');
+
+                tdSTT.textContent=++count;
+                tdHoTen.textContent=hoc_sinh['ten_hoc_sinh']
+                tdLop.textContent=hoc_sinh['ten_lop']
+                hk1=parseFloat(hoc_sinh['tb_hk1'])
+                hk2=parseFloat(hoc_sinh['tb_hk2'])
+
+                tdTBHK1.textContent=''
+                if(hk1)
+                 tdTBHK1.textContent=hk1.toFixed(2)
+
+                tdTBHK2.textContent=''
+                if(hk2)
+                tdTBHK2.textContent=hk2.toFixed(2)
+
+
+                tr.appendChild(tdSTT)
+                tr.appendChild(tdHoTen)
+                tr.appendChild(tdLop)
+                tr.appendChild(tdTBHK1)
+                tr.appendChild(tdTBHK2)
+
+                danhSachHocSinh=document.getElementById('danhSachHocSinh')
+                danhSachHocSinh.appendChild(tr)
+            }
+            }).catch(error => {
+        console.error('Error:', error);
+    });
+
+}

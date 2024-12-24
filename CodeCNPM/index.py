@@ -3,19 +3,19 @@ from flask import request, redirect, render_template, session, abort, jsonify
 from functools import wraps
 import dao
 from flask_login import login_user, current_user
-from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NhanVien, GiaoVien
+from models import HocSinh, ThongTinNamHoc, Lop, HocSinhThuocLop, QuyDinh, NhanVien, GiaoVien, NamHocHienTai
 from models import HocSinh, ThongTinNamHoc, Lop
 from init import app, login, db
 from flask_login import login_user, current_user, login_required, logout_user
 from models import HocSinh
 
 
-@app.route("/")
-def index():
-    if not current_user.is_authenticated:
-        return redirect('/login')
-    else:
-        return render_template("index.html")
+# @app.route("/")
+# def index():
+#     if not current_user.is_authenticated:
+#         return redirect('/login')
+#     else:
+#         return render_template("index.html")
 
 
 def role_required(allowed_roles):
@@ -45,6 +45,8 @@ def login_user_process():
             session['role'] = direct
             if direct.__eq__('qt'):
                 direct = 'admin'
+            elif direct.__eq__('gv'):
+                direct = ''
             return redirect('/' + direct)
         else:
             err_msg = "Tài khoản hoặc mật khẩu của bạn không chính xác"
@@ -67,7 +69,7 @@ def subject():
 @role_required(['nv'])
 @login_required
 def employee():
-    nv = current_user.nhan_vien
+    nv = NhanVien.query.filter(NhanVien.tai_khoan_id.__eq__(current_user.id)).first()
     return render_template('ems/employee.html', nv=nv)
 
 
@@ -88,7 +90,7 @@ def add_student_process():
         address = request.form.get('address')
         contact = request.form.get('contact')
         email = request.form.get('email')
-        if datetime.datetime.now().year - int(date[:4]) >= 15 and datetime.datetime.now().year - int(date[:4]) <= 20:
+        if datetime.datetime.now().year - int(date[:4]) >= QuyDinh.AGE_MIN and datetime.datetime.now().year - int(date[:4]) <= QuyDinh.AGE_MAX:
             dao.add_student(id=student_id, ho=first_name, ten=last_name, gioi_tinh=sex, dia_chi=address, email=email,
                         ngay_sinh=date, so_dien_thoai=contact)
             msg = "Thêm thành công"
@@ -107,6 +109,7 @@ def search_student():
     theme_name = "Tìm kiếm học sinh"
     id = request.args.get('id')
     student = dao.find_student(id)
+
     return render_template("ems/search_student.html", theme_name=theme_name, student=student)
 
 
@@ -191,7 +194,7 @@ def create_class():
             list_student_js.append(student)
         session['list_student'] = list_student_js
         return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=int(session['class_id']),
-                               list_student=list_student_js)
+                               list_student=list_student_js, nam_hoc=NamHocHienTai.NAM_HOC, hoc_ky=str(NamHocHienTai.HOC_KY))
     elif request.method.__eq__('POST'):
         list_student = session['list_student']
         dao.add_student_into_class(list_student=list_student, class_id=session['class_id'])
@@ -199,9 +202,9 @@ def create_class():
         list_student = session['list_student']
         return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class,
                                selected_id=int(session['class_id']), list_student=list_student
-                               , number_of_class=session['number_of_class'])
+                               , number_of_class=session['number_of_class'], nam_hoc=NamHocHienTai.NAM_HOC, hoc_ky=str(NamHocHienTai.HOC_KY))
     return render_template('ems/create_class.html', theme_name=theme_name, list_class=list_class, selected_id=1, list_student=[]
-                         , number_of_class=0)
+                         , number_of_class=0, nam_hoc=NamHocHienTai.NAM_HOC, hoc_ky=str(NamHocHienTai.HOC_KY))
 
 
 @app.route("/api/create_class/<hoc_sinh_id>", methods=['delete'])
@@ -214,6 +217,14 @@ def delete_student(hoc_sinh_id):
             return jsonify({"success": True, "message": "Học sinh đã được xóa"})
     return jsonify({"success": False, "message": "Học sinh không tồn tại"})
 
+#Xoa hoc sinh khoi lop
+@app.route("/api/adjust_class/<hoc_sinh_id>&<class_id>", methods=['delete'])
+def delete_student_class(hoc_sinh_id,class_id):
+    if dao.delete_hocsinh(idHocSinh=hoc_sinh_id,idLop=class_id):
+         db.session.commit()
+         return jsonify({"success":True, "message": "Xóa học sinh thành công!"})
+    return jsonify({"success": False, "message": "Xóa học sinh không thành công!"})
+
 #Dieu chinh lop
 @app.route('/nv/adjust_class')
 @role_required(['nv'])
@@ -221,8 +232,9 @@ def delete_student(hoc_sinh_id):
 def adjust_class():
     theme_name = "Điều chỉnh danh sách lớp"
     danhsachlop=dao.get_hocsinh_lop()
-    return render_template('ems/adjust_class.html', theme_name=theme_name,danhsachlop=danhsachlop)
+    return render_template('ems/adjust_class.html', theme_name=theme_name,danhsachlop=danhsachlop,quydinh=QuyDinh)
 
+#Lay danh sach hoc sinh theo lop
 @app.route('/nv/adjust_class/get_listStudent',methods=['GET'])
 def get_hocSinhTheoLop():
     idLop=request.args.get('id_lop')
@@ -237,13 +249,57 @@ def get_hocSinhTheoLop():
     } for student in result]
     return jsonify(listStudent)
 
+#Them hoc sinh moi khi dieu chinh lop
+@app.route('/nv/adjust_class',methods=['POST'])
+@role_required(['nv'])
+@login_required
+def dieuChinhLop_themHocSinh():
+    data=request.get_json()
+    student_obj=data['students']
+    class_id=student_obj[0]['id_class']
+    # list_student_class=dao.get_listHocSinh_lop(class_id)
+    dao.add_student_into_class(list_student=student_obj,class_id=class_id)
+    return jsonify({"success": True, "message": "Học sinh đã được thêm vào lớp"})
+
+@app.route('/nv/adjust_class/get_hocSinh',methods=['GET'])
+@role_required(['nv'])
+@login_required
+def dieuChinhLop_getHocSinh():
+    student_id=request.args.get('student_id')
+    class_id=request.args.get('class_id')
+    siSo=request.args.get('si_so')
+    list_student_class = dao.get_listHocSinh_lop(class_id)
+    kiemtrahocsinhcolop=dao.kiemtra_hocsinh_lop(student_id)
+
+    if int(siSo)>=QuyDinh.SI_SO:
+        mess = "Quá số lượng học sinh quy định."
+        return jsonify({'message': mess})
+    if kiemtrahocsinhcolop:
+        return jsonify([])
+    for item in list_student_class:
+        if item[0].__eq__(student_id):
+            return jsonify([])
+    result=dao.get_hocsinh(student_id)
+    if result :
+        sex={True:"Nữ", False: "Nam"} [result[3]]
+        student={
+            "id":result[0],
+            "ho_ten":result[1]+" "+result[2],
+            "gioi_tinh":sex,
+            "ngay_sinh": result[4].strftime("%d-%m-%Y"),
+            "dia_chi": result[5]
+
+        }
+        return jsonify(student)
+    return jsonify([])
+
 
 #Trang Giao Vien
 @app.route('/gv')
 @role_required(['gv'])
 @login_required
 def teacher():
-    gv = GiaoVien.query.filter(current_user.id.__eq__(GiaoVien.tai_khoan_id))
+    gv = GiaoVien.query.filter(GiaoVien.tai_khoan_id.__eq__(current_user.id)).first()
     return render_template('teacher/teacher.html', gv=gv)
 
 
@@ -252,15 +308,76 @@ def teacher():
 @login_required
 def nhap_diem():
     theme_name = "Nhập điểm"
-    return render_template('teacher/nhapdiem.html', theme_name=theme_name)
+    list_class = dao.get_list_class_of_teacher()
+    return render_template('teacher/nhapdiem.html', theme_name=theme_name, list_class=list_class
+                           , hoc_ki=NamHocHienTai.HOC_KY, nam_hoc=NamHocHienTai.NAM_HOC)
 
+@app.route("/api/gv/get-subject/<class_id>", methods=['post'])
+def get_class(class_id):
+    data = request.get_json()
+    list_subject = dao.get_subject_of_teacher_in_class(data['class_id'])
+    subject_json = []
+    for subject in list_subject:
+        json = {
+            "id": subject.giao_vien_day_mon.mon_hoc.id,
+            "ten_mon_hoc": subject.giao_vien_day_mon.mon_hoc.ten_mon_hoc
+        }
+        subject_json.append(json)
+    return jsonify(subject_json)
+
+@app.route('/api/gv/nhap_diem', methods=['post'])
+def get_list_student():
+    data = request.get_json()
+    list_student = dao.get_listHocSinh_lop(data['class_id'])
+    list_student_json = []
+    for student in list_student:
+        list_student_json.append({
+            "student_id": student.id,
+            "name": student.ho + " " + student.ten
+        })
+    return jsonify(list_student_json)
+
+@app.route('/api/gv/get-score', methods=['post'])
+def get_score():
+    data = request.get_json()
+    phut_15 = int(data['number_15'])
+    phut_45 = int(data['number_45'])
+    trang_thai = {}
+    for score in data['student_score']:
+        trang_thai = dao.save_score(student_id=score[0], subject_id=data['subject_id'],
+                       score_15=score[1][:phut_15]
+                       , score_45=score[1][phut_15:phut_15 + phut_45], score_cuoi_ky=[score[1][-1]])
+        if trang_thai['success'].__eq__("fail"):
+            break
+    return jsonify(trang_thai)
+
+@app.route("/api/gv/nhap_diem/xem_diem", methods=['get'])
+def xem_diem():
+    class_id = request.args.get("class_id")
+    subject_id = request.args.get("subject_id")
+    list_student = dao.get_listHocSinh_lop(class_id)
+    score_all_student = []
+    for student in list_student:
+        score_of_student = dao.get_score(subject_id, student)
+        score_js = {
+            "name": student.ho + " " + student.ten,
+            "score": {
+                "test_15": score_of_student[0],
+                "test_45": score_of_student[1],
+                "test_ck": score_of_student[2]
+            }
+        }
+        score_all_student.append(score_js)
+    return jsonify(score_all_student)
 
 @app.route('/gv/xuat_diem')
 @role_required(['gv'])
 @login_required
 def xuat_diem():
     theme_name = "Xuất điểm"
-    return render_template('teacher/xuatdiem.html', theme_name=theme_name)
+    list_class = dao.get_list_class_of_teacher()
+    list_namhoc=dao.get_namhoc_giaovienday()
+    return render_template('teacher/xuatdiem.html', theme_name=theme_name,list_class=list_class,list_namhoc=list_namhoc)
 
 
 @login.user_loader
@@ -285,7 +402,47 @@ def log_out():
     return redirect('login')
 
 
-#
+#lay lop theo nam hoc
+@app.route('/gv/xuat_diem/getclass', methods=['GET'])
+def get_lopTheoNamHoc():
+    nam_hoc = request.args.get('namHoc')
+    result=dao.get_lop_namhoc(nam_hoc)
+    name_class={
+        "id": result.lop.id,
+        "ten_lop":result.lop.ten_lop
+    }
+    return jsonify(name_class)
+#Lay hoc sinh bao cao diem
+@app.route('/api/gv/xuat_diem', methods=['POST'])
+def get_hocSinhBaoCaoDiem():
+    data= request.get_json()
+    result=dao.get_diemTB_hocKi(tenlop=data['ten_lop'],namhoc=data['nam_hoc'])
+    if not result:
+        return jsonify([])
+    list_students={}
+    for item in result:
+        if item[0] not in list_students:
+            list_students[item[0]] = {
+                'ten_hoc_sinh': item[1],
+                'ten_lop': item[2],
+                'tb_hk1': None,
+                'tb_hk2': None
+            }
+        if item[3] == 1:
+            list_students[item[0]]['tb_hk1'] = item[4]
+        elif item[3] == 2:
+            list_students[item[0]]['tb_hk2'] = item[4]
+    # list_students = [
+    #     {
+    #         'ten_hoc_sinh': student_data['ten_hoc_sinh'],
+    #         'ten_lop': student_data['ten_lop'],
+    #         'tb_hk1': student_data['tb_hk1'],
+    #         'tb_hk2': student_data['tb_hk2']
+    #     }
+    #     for student_data in result.values()
+    # ]
+    return jsonify(list_students)
+
 @app.route('/admin/get_thongke', methods=['GET'])
 def get_thongke():
     nam_hoc = request.args.get('nam_hoc')
@@ -305,5 +462,4 @@ def get_thongke():
 if __name__ == '__main__':
     with app.app_context():
         from admin import admin
-
-        app.run(debug=True, port=2004)
+        app.run(debug=True)

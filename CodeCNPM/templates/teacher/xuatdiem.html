@@ -2,75 +2,45 @@
 
 {% block content %}
 <div class="main-container">
-    <form action="/nv/add" method="post">
+    {% if list_namhoc %}
+    <form method="post">
         <div class="thems-text">Nhập thông tin</div>
         <div class="content-block flex">
             <div class="content flex">
-                <label>Chọn lớp:</label>
-                <select name="class" id="class">
-                     {% for class in list_class %}
-                    <option name="" value="">{{class.lop.ten_lop}}</option>
-                     {% endfor %}
+                <label for="year">Chọn năm học:</label>
+                <select name="year" id="year" onchange="thaydoiNamHoc()">
+                    {% for year in list_namhoc %}
+                    <option name="" value="{{year.thong_tin_nam_hoc.nam_hoc}}">{{year.thong_tin_nam_hoc.nam_hoc}}</option>
+                    {% endfor %}
                 </select>
             </div>
-            <div class="content flex">
-                <label for="subject">Chọn môn học:</label>
-                <select name="subject" id="subject">
-                    <option name="" value="">Toán</option>
-                    <option name="" value="">Ngữ Văn</option>
-                </select>
-            </div>
+             <div class="content flex">
+                <label >Chọn lớp:</label>
+                <input type="text" readonly value="" id="name_class"/>
+             </div>
         </div>
 
-        <div class="content-block flex">
-            <div class="content flex">
-                <label for="semester">Chọn học kì:</label>
-                <select name="semester" id="semester">
-                    <option name="" value="">1</option>
-                    <option name="" value="">2</option>
-                </select>
-            </div>
-            <div class="content flex">
-                <label for="semester">Chọn năm học:</label>
-                <select name="year" id="year">
-                    <option name="" value="">2024</option>
-                    <option name="" value="">2025</option>
-                </select>
-            </div>
-        </div>
-
-        <button type="submit" class="button left">Xem điểm</button>
+        <button type="button" class="button left" onclick="loadDanhSachDiem()">Xem điểm</button>
     </form>
-
+     <div class="mt-2 mb-2"> <h2>Bảng điểm môn học</h2></div>
     <div class="table-container">
         <table class="score-table">
             <thead>
             <tr>
                 <th>STT</th>
                 <th>Họ tên</th>
-                <!--                set colspan = số cột-->
-                <th colspan="4">Điểm 15’</th>
-                <th colspan="1">Điểm 1 tiết</th>
-                <th>Điểm thi</th>
+                <th>Lớp</th>
+                <th>Điểm TB HK1</th>
+                <th>Điểm TB HK2</th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td>1</td>
-                <td>Nguyễn Văn A</td>
-                <!--                Cột 15 phút-->
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <!--                Cột 45 phút-->
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-                <!--                Cột thi-->
-                <td class="score"><input type="text" class="scoreInput" maxlength="2" oninput="limitInput()"></td>
-            </tr>
+            <tbody id="danhSachHocSinh">
+
             </tbody>
         </table>
     </div>
-
+    {% else %}
+    <h1 style="color:red;text-align:center; margin-top:5rem;">Không có quyền truy cập</h1>
+    {% endif %}
 </div>
 {% endblock %}
